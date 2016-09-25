@@ -1,0 +1,11 @@
+---
+title: Solo Application
+author: SBCSA
+output: html_document
+---
+
+<h1>`r renderText(input$s_name)`</h1>
+<h2>`r renderText(ifelse(input$route=="Anacapa to mainland","Anacapa to mainland",input$route_other))`</h2>
+<h2>`r renderText(as.Date(input$harbor_date, origin="1970-01-01"))`</h2>
+
+### hello
