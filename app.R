@@ -43,7 +43,7 @@ server <- function(input, output) {
     else hide("new_lifetime")
   })
   
-  output$preview <- renderUI({
+  output$preview_content <- renderUI({
     knit("./preview_app.Rmd")
     includeMarkdown("./preview_app.md")
   })
@@ -53,7 +53,8 @@ ui <- fluidPage(useShinyjs(),
   titlePanel("SBCSA"),
   navlistPanel("Solo Application",
       
-    # -------- SWIMMER INFO -------------
+    # -------- THE SWIMMER -------------
+    
     tabPanel("Swimmer Info",
       textInput("s_name", "Full Name"),
       selectInput("s_gender", "Gender", c("Female", "Male")),
@@ -61,7 +62,7 @@ ui <- fluidPage(useShinyjs(),
       textInput("s_email", "Email Address"),
       fluidRow(
         column(6, textInput("s_phone", "Phone")),
-        column(6, textInput("s_alt_phone", "Alt. Phone"))
+        column(6, textInput("s_phone_alt", "Alt. Phone"))
       ),
       textAreaInput("s_mailing", "Mailing Address"),
       p("Are you a primary citizen of a different country than your residence?"),
@@ -84,6 +85,7 @@ ui <- fluidPage(useShinyjs(),
     ),
     
     # ----------- THE SWIM --------------
+    
     tabPanel("The Swim",
       radioButtons("route", "What route will you be swimming?", 
         choices = c("Anacapa to mainland", "some other route")
@@ -112,6 +114,7 @@ ui <- fluidPage(useShinyjs(),
     ),
   
     # -------- SUPPORT TEAM ---------------
+    
     tabPanel("Support Team",
       h4("Crew Chief"),
       p("Who will be your lead support person on the boat?"),
@@ -126,6 +129,7 @@ ui <- fluidPage(useShinyjs(),
     ),
     
     # -------- MARATHON SWIMMING BACKGROUND --------
+    
     tabPanel("Marathon Swimming Background",
       p("Please list up to five documented marathon swims you have completed, 
         especially swims from the past 1-3 years."),
@@ -169,18 +173,9 @@ ui <- fluidPage(useShinyjs(),
     ),
     
     # ---------- HEALTH & MEDICAL CLEARANCE ----------
+    
     tabPanel("Health & Medical Clearance",
-      p("Marathon swimming is an inherently physically stressful activity, 
-        even under the best of circumstances."),
-      p("All swimmers undertaking SBCSA-sanctioned swims must be in 
-        excellent general health, and must have been examined by a
-        physician within the twelve months prior to their scheduled attempt."),
-      p("Is there any aspect of your personal health or medical history 
-        that may affect your ability to successfully complete this swim?"),
-      p("If yes, please describe the issue below."),
-      p("Please note, the information you provide does not necessarily 
-        disqualify your application. But it may help the SBCSA and your
-        official observer better serve you during your swim attempt."),
+      includeMarkdown("medical.md"),
       textAreaInput("health_disclosure", "Health Disclosure"),
       p("Please read the following two statements. 
         If they are true, please check the boxes and sign your name below."),
@@ -195,35 +190,27 @@ ui <- fluidPage(useShinyjs(),
     ),
     
     # ------ WAIVER & RELEASE OF LIABILITY ---------
+    
     tabPanel("Waiver & Release of Liability",
       h5(waiver[1]), hr(),
-      p(waiver[2]), p(waiver[3]),
-      p(waiver[4]),
-      p(waiver[5]),
-      p(waiver[6]),
-      p(waiver[7]),
-      p(waiver[8]),
-      p(waiver[9]),
-      p(waiver[10]),
-      p(waiver[11]),
-      p(waiver[12]),
-      p(waiver[13]),
-      p(waiver[14])
+      p(waiver[2]), p(waiver[3]), textInput("initial1", "Initials", width = 50),
+      p(waiver[4]), textInput("initial1", "Initials", width = 50),
+      p(waiver[5]), textInput("initial2", "Initials", width = 50),
+      p(waiver[6]), textInput("initial3", "Initials", width = 50),
+      p(waiver[7]), textInput("initial4", "Initials", width = 50),
+      p(waiver[8]), textInput("initial5", "Initials", width = 50),
+      p(waiver[9]), textInput("initial6", "Initials", width = 50),
+      p(waiver[10]), textInput("initial7", "Initials", width = 50),
+      p(waiver[11]), textInput("initial8", "Initials", width = 50),
+      p(waiver[12]), textInput("initial9", "Initials", width = 50),
+      p(waiver[13]), textInput("initial10", "Initials", width = 50),
+      p(waiver[14]), textInput("initial11", "Initials", width = 50)
     ),
     
     # --------- SANCTION FEES ---------
+    
     tabPanel("Sanction Fees",
-      p("When you submit your application (on the next page), 
-        we will send you an invoice of sanction fees for your 
-        chosen swim route within 48 hours."),
-      p("We accept four methods of payment for sanction fees:"),
-      tags$ul(
-        tags$li("Electronic bank transfer via Dwolla (no surcharge)."),
-        tags$li("PayPal (2.9% surcharge, credit cards accepted)."),
-        tags$li("Personal check (no surcharge)."),
-        tags$li("Wire transfer (no extra surcharge, but may be subject 
-                to outgoing transfer fees charged by your bank)")
-      ),
+      includeMarkdown("sanction_fees.md"),
       
       radioButtons("payment_choice", "Which method of payment do you plan to use?",
                    c("Dwolla", "PayPal", "personal check", "wire transfer",
@@ -247,21 +234,17 @@ ui <- fluidPage(useShinyjs(),
       )),
       
       h3("Cancellation Policy"),
-      tags$ul(
-        tags$li("The SBCSA will refund sanction fees for cancelled swims, minus a $200 processing fee."),
-        tags$li("Sanction fees may be applied to a rescheduled swim without a fee, as long as the reschedule occurs at least 48 hours before the scheduled meet time."),
-        tags$li("Swims rescheduled less than 48 hours before meet time are subject to a $200 processing fee."),
-        tags$li("Swims called off any time after the swimmer enters the water are not eligible for a refund of sanction fees.")
-      ),
+      includeMarkdown("cancel_policy.md"),
       p("I understand the cancellation policy"),
       
       checkboxInput("cancel_policy", "Yes")
     ),
     
     # --------- PREVIEW PAGE -----------
+    
     tabPanel("Preview Application Submission",
       actionButton("preview_gen", "Generate Preview"),
-      uiOutput("preview")
+      uiOutput("preview_content")
     )
   )
 )

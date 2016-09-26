@@ -6,6 +6,51 @@ output: html_document
 
 <h1>`r renderText(input$s_name)`</h1>
 <h2>`r renderText(ifelse(input$route=="Anacapa to mainland","Anacapa to mainland",input$route_other))`</h2>
-<h2>`r renderText(as.Date(input$harbor_date, origin="1970-01-01"))`</h2>
+<h2>`r renderText(format(as.Date(input$harbor_date, origin="1970-01-01"), "%B %d, %Y"))`</h2>
 
-### hello
+---
+
+<table>
+<tr><th>Gender</th><th>D.O.B.</th><th>Age on Swim Date</th><th>Citizen</th></tr>
+<tr>
+<td>`r renderText(input$s_gender)`</td>
+<td>`r renderText(format(as.Date(input$s_dob, origin="1970-01-01"), "%Y-%b-%d"))`</td>
+<td>`r renderText(input$s_name)`</td>
+<td>`r renderText(input$s_citizenship)`</td>
+</tr>
+</table>
+
+### Contact Info
+
+<table>
+<tr><th>Email</th><th>Phone</th><th>Alt. Phone</th><th>Address</th></tr>
+<tr>
+<td>`r renderText(input$s_email)`</td>
+<td>`r renderText(input$s_phone)`</td>
+<td>`r renderText(input$s_phone_alt)`</td>
+<td>`r renderText(input$s_mailing)`</td>
+</tr>
+</table>
+
+### Emergency Contact
+
+<table>
+<tr><th>Name</th><th>Email</th><th>Phone</th><th>Alt. Phone</th></tr>
+<tr>
+<td>`r renderText(input$ec_name)`</td>
+<td>`r renderText(input$ec_email)`</td>
+<td>`r renderText(input$ec_phone)`</td>
+<td>`r renderText(input$ec_phone_alt)`</td>
+</tr>
+</table>
+
+### Escort Boat
+
+<ul>
+<li><strong>Boat:</strong> `r renderText(input$escort_boat)`</li>
+<li><strong>Depart harbor</strong>: `r renderText(format(as.Date(input$harbor_date, origin="1970-01-01"), "%a %b %d %Y"))`, `r renderText(input$harbor_time)`:00</li>
+<li><strong>Swimmer in the water</strong>: `r renderText(format(as.Date(input$splash_date, origin="1970-01-01"), "%a %b %d %Y"))`, `r renderText(input$splash_time)`:00</li>
+</ul>
+
+### Support Team
+

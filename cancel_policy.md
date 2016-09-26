@@ -1,0 +1,4 @@
+- The SBCSA will refund sanction fees for cancelled swims, minus a $200 processing fee.
+- Sanction fees may be applied to a rescheduled swim without a fee, as long as the reschedule occurs at least 48 hours before the scheduled meet time.
+- Swims rescheduled less than 48 hours before meet time are subject to a $200 processing fee.
+- Swims called off any time after the swimmer enters the water are not eligible for a refund of sanction fees.
