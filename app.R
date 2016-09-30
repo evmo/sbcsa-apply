@@ -4,7 +4,10 @@ islands <- readLines("islands.txt")
 boats <- readLines("boats.txt")
 waiver <- readLines("waiver.txt")
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+
+  rv <- reactiveValues(v = 0, crew_count = 0, swim_count = 0)
+
   observe({
     if (input$other_citizen == T) show("s_citizenship") 
     else hide("s_citizenship")
@@ -31,6 +34,7 @@ server <- function(input, output) {
       column(2, textInput(paste0("swim_dur", input$add_swim), "Duration")),
       column(2, textInput(paste0("swim_temp", input$add_swim), "Temp"))
     )))
+    data$crew_count <- data$crew_count + 1
   })
   
   observe({
@@ -42,10 +46,20 @@ server <- function(input, output) {
     if (input$current_lifetime == "No") show("new_lifetime") 
     else hide("new_lifetime")
   })
+
+  outFile <- reactiveFileReader(1000, session, "output.md", readLines)
   
-  output$preview_content <- renderUI({
-    knit("./preview_app.Rmd")
-    includeMarkdown("./preview_app.md")
+  
+  
+  output$preview <- renderUI({
+    rv$v
+    includeMarkdown("output.md")
+  })
+
+  observeEvent(input$gen_markdown, {
+    out <- knit_expand("template.md")
+    writeLines(out, "output.md")
+    rv$v <- rv$v + 1
   })
 }
 
@@ -243,8 +257,8 @@ ui <- fluidPage(useShinyjs(),
     # --------- PREVIEW PAGE -----------
     
     tabPanel("Preview Application Submission",
-      actionButton("preview_gen", "Generate Preview"),
-      uiOutput("preview_content")
+      actionButton("gen_markdown", "Generate Preview"),
+      uiOutput("preview")
     )
   )
 )

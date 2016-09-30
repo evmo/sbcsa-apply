@@ -26,7 +26,7 @@ output: html_document
 <tr><th>Email</th><th>Phone</th><th>Alt. Phone</th><th>Address</th></tr>
 <tr>
 <td>`r renderText(input$s_email)`</td>
-<td>`r renderText(input$s_phone)`</td>
+<td>`r renderText(input$s_email)`</td>
 <td>`r renderText(input$s_phone_alt)`</td>
 <td>`r renderText(input$s_mailing)`</td>
 </tr>
@@ -54,3 +54,9 @@ output: html_document
 
 ### Support Team
 
+<p><strong>Crew Chief:</strong> `r renderText(input$cc_name)` - `r renderText(input$cc_email)` - `r renderText(input$cc_phone)`</p>
+
+<table>
+<tr><th>Name</th><th>Role</th><th>Contact</th></tr>
+`r for (i in 1:10) { name <- paste0("name", i); role <- paste0("role", i); contact <- paste0("contact", i); renderText("<tr>"); renderText(paste0("<td>", input[[name]]), "</td>"); renderText(paste0("<td>", input[[role]]), "</td>"); renderText(paste0("<td>", input[[contact]]), "</td>"); renderText("</tr>") } `
+</table>
