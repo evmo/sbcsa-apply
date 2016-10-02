@@ -1,8 +1,22 @@
-library(shiny); library(shinyjs); library(knitr)
+library(shiny); library(shinyjs); library(knitr); library(lubridate)
 countries <- readLines("countries.txt")
 islands <- readLines("islands.txt")
 boats <- readLines("boats.txt")
 waiver <- readLines("waiver.txt")
+jsCode <- "
+$(function() {
+	$('#sig').signature();
+$('#clear').click(function() {
+  $('#sig').signature('clear');
+});
+$('#json').click(function() {
+  alert($('#sig').signature('toJSON'));
+});
+$('#svg').click(function() {
+  alert($('#sig').signature('toSVG'));
+});
+});
+"
 
 server <- function(input, output, session) {
 
@@ -24,6 +38,7 @@ server <- function(input, output, session) {
       column(4, textInput(paste0("crew_role", input$add_crew), "Role")),
       column(4, textInput(paste0("crew_contact", input$add_crew), "Contact Phone or Email"))
     )))
+    rv$crew_count <- rv$crew_count + 1
   })
   
   observeEvent(input$add_swim, {
@@ -34,7 +49,7 @@ server <- function(input, output, session) {
       column(2, textInput(paste0("swim_dur", input$add_swim), "Duration")),
       column(2, textInput(paste0("swim_temp", input$add_swim), "Temp"))
     )))
-    data$crew_count <- data$crew_count + 1
+    rv$swim_count <- rv$swim_count + 1
   })
   
   observe({
@@ -49,8 +64,6 @@ server <- function(input, output, session) {
 
   outFile <- reactiveFileReader(1000, session, "output.md", readLines)
   
-  
-  
   output$preview <- renderUI({
     rv$v
     includeMarkdown("output.md")
@@ -61,9 +74,26 @@ server <- function(input, output, session) {
     writeLines(out, "output.md")
     rv$v <- rv$v + 1
   })
+  
+  validation <- function(page) {
+    validate(
+      need(input$s_name != "", "Name required")
+    )
+  }
+  
+  output$valid_page1 <- renderUI(validation(page1))
 }
 
 ui <- fluidPage(useShinyjs(),
+  tags$head(
+    includeScript("http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/south-street/jquery-ui.css"),
+    includeScript("jquery.signature.js"),
+    includeCSS("jquery.signature.css"),
+    includeCSS("custom.css"),
+    includeCSS("http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/south-street/jquery-ui.css"),
+    tags$script(jsCode)
+  ),
+  
   titlePanel("SBCSA"),
   navlistPanel("Solo Application",
       
@@ -71,8 +101,10 @@ ui <- fluidPage(useShinyjs(),
     
     tabPanel("Swimmer Info",
       textInput("s_name", "Full Name"),
-      selectInput("s_gender", "Gender", c("Female", "Male")),
-      dateInput("s_dob", "Date of Birth", startview = "year"),
+      selectInput("s_gender", "Gender", c("[SELECT]", "Female", "Male")),
+      dateInput("s_dob", "Date of Birth", startview = "year",
+                min = Sys.Date() - years(100), max = Sys.Date() - 365,
+                value = Sys.Date() - years(40)),
       textInput("s_email", "Email Address"),
       fluidRow(
         column(6, textInput("s_phone", "Phone")),
@@ -95,7 +127,8 @@ ui <- fluidPage(useShinyjs(),
       fluidRow(
         column(6, textInput("ec_phone", "Phone")),
         column(6, textInput("ec_alt_phone", "Alt. Phone"))
-      )
+      ),
+      uiOutput("valid_page1")
     ),
     
     # ----------- THE SWIM --------------
@@ -218,7 +251,12 @@ ui <- fluidPage(useShinyjs(),
       p(waiver[11]), textInput("initial8", "Initials", width = 50),
       p(waiver[12]), textInput("initial9", "Initials", width = 50),
       p(waiver[13]), textInput("initial10", "Initials", width = 50),
-      p(waiver[14]), textInput("initial11", "Initials", width = 50)
+      p(waiver[14]), textInput("initial11", "Initials", width = 50),
+      tags$div(HTML('
+        <div id="sig"></div>
+        <p style="clear: both;"><button id="clear">Clear</button> 
+        <button id="json">To JSON</button> <button id="svg">To SVG</button></p>
+      '))
     ),
     
     # --------- SANCTION FEES ---------
