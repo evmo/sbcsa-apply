@@ -3,20 +3,7 @@ countries <- readLines("countries.txt")
 islands <- readLines("islands.txt")
 boats <- readLines("boats.txt")
 waiver <- readLines("waiver.txt")
-jsCode <- "
-$(function() {
-	$('#sig').signature();
-$('#clear').click(function() {
-  $('#sig').signature('clear');
-});
-$('#json').click(function() {
-  alert($('#sig').signature('toJSON'));
-});
-$('#svg').click(function() {
-  alert($('#sig').signature('toSVG'));
-});
-});
-"
+reqd <- function(input) div(p(class = 'reqd', "* Required"), input)
 
 server <- function(input, output, session) {
 
@@ -82,16 +69,20 @@ server <- function(input, output, session) {
   }
   
   output$valid_page1 <- renderUI(validation(page1))
+  
+  observeEvent(input$sig_submit, {
+    js$saveSig
+  })
 }
 
 ui <- fluidPage(useShinyjs(),
   tags$head(
-    includeScript("http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/south-street/jquery-ui.css"),
+    includeScript("http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"),
     includeScript("jquery.signature.js"),
+    includeScript("sig-funcs.js"),
     includeCSS("jquery.signature.css"),
     includeCSS("custom.css"),
-    includeCSS("http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/south-street/jquery-ui.css"),
-    tags$script(jsCode)
+    includeCSS("http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/south-street/jquery-ui.css")
   ),
   
   titlePanel("SBCSA"),
@@ -100,7 +91,7 @@ ui <- fluidPage(useShinyjs(),
     # -------- THE SWIMMER -------------
     
     tabPanel("Swimmer Info",
-      textInput("s_name", "Full Name"),
+      reqd(textInput("s_name", "Full Name")),
       selectInput("s_gender", "Gender", c("[SELECT]", "Female", "Male")),
       dateInput("s_dob", "Date of Birth", startview = "year",
                 min = Sys.Date() - years(100), max = Sys.Date() - 365,
@@ -252,10 +243,11 @@ ui <- fluidPage(useShinyjs(),
       p(waiver[12]), textInput("initial9", "Initials", width = 50),
       p(waiver[13]), textInput("initial10", "Initials", width = 50),
       p(waiver[14]), textInput("initial11", "Initials", width = 50),
+      div(id = "sig"),
+      
       tags$div(HTML('
-        <div id="sig"></div>
         <p style="clear: both;"><button id="clear">Clear</button> 
-        <button id="json">To JSON</button> <button id="svg">To SVG</button></p>
+	      <button id="json">To JSON</button></p>
       '))
     ),
     
