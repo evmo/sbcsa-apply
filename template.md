@@ -75,4 +75,6 @@ To the best of my knowledge, I am in excellent general health and have not omitt
 I have been examined by a medical doctor within the past 12 months, and have been specifically cleared to undertake this event. | Yes
 Date of Medical Exam | {{input$med_date}}
 
-**Electronic signature on file.**
+### Signature
+
+<div id="sig_svg"></div>
