@@ -10,15 +10,15 @@ Gender | D.O.B | Age on Swim Date | Citizen
 
 ### Contact Info
 
-Email | Phone | Alt. Phone | Address |
+Email | Phone | Address |
 ----- | ----- | ---------- | ------- |
-{{input$s_email}} | {{input$s_phone}} | {{input$s_phone_alt}} | {{input$s_mailing}}
+{{input$s_email}} | {{input$s_phone}} | {{input$s_mailing}}
 
 ### Emergency Contact
 
-Name | Email | Phone | Alt. Phone |
+Name | Relationship | Email | Phone | 
 ---- | ----- | ----- | ---------- |
-{{input$ec_name}} | {{input$ec_email}} | {{input$ec_phone}} | {{input$ec_phone_alt}}
+{{input$ec_name}} | {{input$ec_rel}} | {{input$ec_email}} | {{input$ec_phone}}
 
 ### Escort Boat
 

@@ -1,9 +1,11 @@
-library(shiny); library(shinyjs); library(knitr); library(lubridate)
+library(shiny); library(shinyjs); library(knitr)
+library(lubridate); library(rmarkdown); library(magrittr)
 countries <- readLines("countries.txt")
 islands <- readLines("islands.txt")
 boats <- readLines("boats.txt")
 waiver <- readLines("waiver.txt")
 reqd <- function(input) div(p(class = 'reqd', "* Required"), input)
+DIR <- if (grepl("dev", getwd())) "~/dev/sbcsa-apply" else "~/sbcsa-apps"
 
 server <- function(input, output, session) {
 
@@ -53,11 +55,10 @@ server <- function(input, output, session) {
       shinyjs::hide("new_lifetime")
   })
   
+  # when harbor departure entered, update splash date to match
   observeEvent(input$harbor_date, {
     updateDateInput(session, "splash_date", value = input$harbor_date)
   })
-  
-  observeEvent(input$gen_markdown, shinyjs::show("preview_and_sig"))
   
   # insertUIs for crew members & documented swims
   
@@ -135,11 +136,25 @@ server <- function(input, output, session) {
     out <- knit_expand("template.md")
     writeLines(out, "output.md")
     rv$v <- rv$v + 1
+    shinyjs::show("preview")
+    shinyjs::show("draw_sig")
+  })
+
+  observeEvent(input$submit_app, {
+    file_name <- gsub(" ", "_", input$s_name) %>% tolower %>% paste0(".md")
+    file.copy("output.md", file.path(DIR, file_name))
+    # rmarkdown::render(input = "output.md", 
+    #                   output_format = "pdf_document",
+    #                   output_file = file_name,
+    #                   output_dir = DIR)
+    shinyjs::show("download")
   })
   
-  # observeEvent(input$sig_submit, {
-  #   js$saveSig
-  # })
+  output$download <- downloadHandler(
+    filename = "SBSCA_sanction_app.pdf",
+    content = file.path(DIR, 
+                        tolower(gsub(" ", "_", input$s_name)))
+  )
 }
 
 ui <- fluidPage(useShinyjs(),
@@ -315,7 +330,8 @@ p("You may wish to provide additional information about your
     
     tabPanel("Waiver & Release of Liability",
       h5(waiver[1]), hr(),
-      p(waiver[2]), p(waiver[3]), reqd(textInput("initial1", "Initials", width = 50)),
+      p(waiver[2]), 
+      p(waiver[3]), reqd(textInput("initial1", "Initials", width = 50)),
       p(waiver[4]), reqd(textInput("initial1", "Initials", width = 50)),
       p(waiver[5]), reqd(textInput("initial2", "Initials", width = 50)),
       p(waiver[6]), reqd(textInput("initial3", "Initials", width = 50)),
@@ -366,15 +382,20 @@ p("You may wish to provide additional information about your
     
     tabPanel("Preview Application Submission",
       actionButton("gen_markdown", "Generate Preview"),
-      hidden(div(id = "preview_and_sig",
-        uiOutput("preview"),
-        div(id = "sig"),
+      hidden(uiOutput("preview")),
+      
+      # signature-drawing widget
+      hidden(div(id = "draw_sig",
         tags$div(HTML('
-          <p style="clear: both;"><button id="clear">Clear</button> 
-          <button id="sig_submit">Submit</button></p>
+          <p style="clear: both;"><button id="clear">Clear Signature</button> 
+          <button id="sig_submit">Submit Signature</button></p>
           '))
       )),
-      hidden(div(id = "sig_json"))
+
+      hidden(div(id = "submit_button", 
+        actionButton("submit_app", "SUBMIT APPLICATION")
+      )),
+      hidden(downloadButton("download"))
     )
   )
 )

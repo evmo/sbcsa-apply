@@ -1,10 +1,11 @@
 $(function() {
-	$('#sig').signature();
+	$('#draw_sig').signature();
 	$('#clear').click(function() {
-		$('#sig').signature('clear');
+		$('#draw_sig').signature('clear');
 	});
 	$('#sig_submit').click(function() {
-		$('#sig_json').replaceWith($('#sig').signature('toJSON')).hide();
-		$('#sig_svg').replaceWith($('#sig').signature('toSVG'));
+		$('#sig_svg').replaceWith($('#draw_sig').signature('toSVG'));
+		$('#draw_sig').hide();
+		$('#submit_button').removeClass('shinyjs-hide');
 	});
 });
