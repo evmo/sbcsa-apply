@@ -1,2 +1,26 @@
-.kbw-signature { width: 400px; height: 200px; }
 .reqd { color: red; font-size: 11px; margin-bottom: 0px; }
+
+.signature-pad {
+  width: 500px;
+  height: 300px;
+}
+
+.wrapper {
+  position: relative;
+  width: 500px;
+  height: 300px;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.disabled-link {
+   pointer-events: none;
+   cursor: default;
+   color: gray;
+}
+
+.red { color:red; font-weight: bold; }
+
+.big { font-size: 1000%; }
