@@ -1,6 +1,6 @@
 *.Rproj
 .Rproj.user
-
+shiny_bookmarks/
 output.md
 
 *.pdf

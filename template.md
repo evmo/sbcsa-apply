@@ -77,4 +77,4 @@ Date of Medical Exam | {{input$med_date}}
 
 ### Signature
 
-<div id="sig_svg"></div>
+<div id="sig_img"></div>
