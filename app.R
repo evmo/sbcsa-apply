@@ -5,6 +5,7 @@ library(lubridate)
 library(rmarkdown)
 library(magrittr)
 
+source("fill_sample.R")
 countries <- readLines("countries.txt")
 islands <- readLines("islands.txt")
 boats <- readLines("boats.txt")
@@ -53,16 +54,21 @@ server <- function(input, output, session) {
     else 
       shinyjs::hide("new_lifetime")
     
-    if (all(is.null(validation1()), 
-            is.null(validation2()),
-            is.null(validation3()),
-            is.null(validation4()),
-            is.null(validation5()))) {
+    if (all(is.null( validation1() ), 
+            is.null( validation2() ),
+            is.null( validation3() ),
+            is.null( validation4() ),
+            is.null( validation5() ),
+            is.null( validation6() ),
+            is.null( validation7() ) 
+      )) {
       shinyjs::removeClass(class = "disabled-link", 
                            selector = ".nav li:nth-child(9) a,
                                        .nav li:nth-child(10) a")
     }
   })
+  
+  observeEvent(input$fill_sample, fill_sample(session))
   
   # when harbor departure entered, update splash date to match
   observeEvent(input$harbor_date, {
@@ -91,18 +97,29 @@ server <- function(input, output, session) {
     rv$swim_count <- rv$swim_count + 1
   })
   
+  output$waiver_agree <- renderUI({
+    statement <- paste0("I, ", input$s_name, tolower(
+        ", HAVE READ THIS WAIVER AND RELEASE OF LIABILITY, 
+         FULLY UNDERSTAND ITS TERMS, UNDERSTAND THAT I HAVE GIVEN UP 
+         SUBSTANTIAL RIGHTS BY SIGNING IT, AND HAVE SIGNED IT FREELY 
+         AND VOLUNTARILY WITHOUT ANY INDUCEMENT. "),
+      "I understand that typing my name represents a legal signature.")
+    checkboxInput("waiver_box", statement, width = "100%")
+  })
+  
   # Page Validations ---------------------------------
   
   validation1 <- function() {
     validate(
       need(input$s_name != "", 
-           "Name required"),
+           "Please enter your name"),
       need(input$s_dob < Sys.Date() - 18 * 365, 
            "Swimmer must be at least 14 years old"),
       need(grepl(".+@.+\\..+", input$s_email), 
-           "Valid email address required"),
-      need(input$ec_name != "", 
-           "Emergency contact required")
+           "Please enter a valid email address"),
+      need(input$s_mailing != "", "Please enter a mailing address"),
+      need(input$s_country != "[SELECT]", "Please select a country"),
+      need(input$ec_name != "", "Please list an emergency contact")
     )
   }
   
@@ -129,17 +146,17 @@ server <- function(input, output, session) {
   validation4 <- function() {
     validate(
       need(input$feed_plan != "", 
-           "Feed plan required"),
+           "Feed plan is blank"),
       need(input$feed_experience != "", 
-           "Feed experience required"),
+           "Feed experience is blank"),
       need(input$stroke_rate != "", 
-           "Stroke rate required"),
+           "Stroke rate is blank"),
       need(input$breathing != "", 
-           "Breathing pattern required"),
+           "Breathing pattern is blank"),
       need(input$hypothermia != "", 
-           "Hypothermia experience required"),
+           "Hypothermia experience is blank"),
       need(input$night_swimming != "", 
-           "Night swimming experience required")
+           "Night swimming experience is blank")
     )
   }
   
@@ -153,6 +170,35 @@ server <- function(input, output, session) {
   }
   
   output$valid_page5 <- renderUI(validation5())
+
+  validation6 <- function() {
+    validate(
+      need(input$initial1 != "", "Please initial item #1"),
+      need(input$initial2 != "", "Please initial item #2"),
+      need(input$initial3 != "", "Please initial item #3"),
+      need(input$initial4 != "", "Please initial item #4"),
+      need(input$initial5 != "", "Please initial item #5"),
+      need(input$initial6 != "", "Please initial item #6"),
+      need(input$initial7 != "", "Please initial item #7"),
+      need(input$initial8 != "", "Please initial item #8"),
+      need(input$initial9 != "", "Please initial item #9"),
+      need(input$initial10 != "", "Please initial item #10"),
+      need(input$initial11 != "", "Please initial item #11"),
+      need(input$waiver_box,      "Please check the box"),
+      need(input$waiver_sig != "", "Signature is required")
+    )
+  }
+
+  output$valid_page6 <- renderUI(validation6())
+
+  validation7 <- function() {
+    validate(
+      need(input$payment_choice != "[SELECT]", "Please select a payment method"),
+      need(input$cancel_policy, "Please check the box that you understand the cancellation policy")
+    )
+  }
+
+  output$valid_page7 <- renderUI(validation7())
 
   outFile <- reactiveFileReader(1000, session, "output.md", readLines)
   
@@ -200,15 +246,17 @@ ui <- function(request) {
       # -------- THE SWIMMER -------------
       
       tabPanel("Swimmer Info",
+        actionButton("fill_sample", "Fill in sample data"),
         reqd(textInput("s_name", "Full Name")),
         reqd(dateInput("s_dob", "Date of Birth", startview = "year",
                   min = Sys.Date() - years(100), max = Sys.Date() - 365,
                   value = Sys.Date() - years(40))),
         reqd(textInput("s_email", "Email Address")),
         textInput("s_phone", "Mobile Phone"),
-        textAreaInput("s_mailing", "Mailing Address", width = 400, height = 125),
-        p("Are you a primary citizen of a different country than your residence?"),
-        checkboxInput("other_citizen", "Yes"),
+        reqd(textAreaInput("s_mailing", "Mailing Address", width = 400, height = 125)),
+        reqd(selectInput("s_country", "Country", choices = countries)),
+        checkboxInput("other_citizen", "Check if you a primary citizen of a 
+                                        different country than your residence"),
         hidden(
           selectInput("s_citizenship", "Citizenship", choices = countries)
         ),
@@ -307,7 +355,7 @@ ui <- function(request) {
             tags$li("Your sustainable swimming pace (minutes/seconds per 100m 
                     for pool swimming, or minutes per statute mile for open water)")
           ),
-          textAreaInput("background_details", "Details")
+          textAreaInput("background_details", "Details", width = 400, height = 200)
         ),
         
         reqd(textAreaInput("feed_plan", "What is your feeding plan? 
@@ -360,17 +408,21 @@ ui <- function(request) {
         h5(waiver[1]), hr(),
         p(waiver[2]), 
         p(waiver[3]), reqd(textInput("initial1", "Initials", width = 50)),
-        p(waiver[4]), reqd(textInput("initial1", "Initials", width = 50)),
-        p(waiver[5]), reqd(textInput("initial2", "Initials", width = 50)),
-        p(waiver[6]), reqd(textInput("initial3", "Initials", width = 50)),
-        p(waiver[7]), reqd(textInput("initial4", "Initials", width = 50)),
-        p(waiver[8]), reqd(textInput("initial5", "Initials", width = 50)),
-        p(waiver[9]), reqd(textInput("initial6", "Initials", width = 50)),
-        p(waiver[10]), reqd(textInput("initial7", "Initials", width = 50)),
-        p(waiver[11]), reqd(textInput("initial8", "Initials", width = 50)),
-        p(waiver[12]), reqd(textInput("initial9", "Initials", width = 50)),
-        p(waiver[13]), reqd(textInput("initial10", "Initials", width = 50)),
-        p(waiver[14]), reqd(textInput("initial11", "Initials", width = 50))
+        p(waiver[4]), reqd(textInput("initial2", "Initials", width = 50)),
+        p(waiver[5]), reqd(textInput("initial3", "Initials", width = 50)),
+        p(waiver[6]), reqd(textInput("initial4", "Initials", width = 50)),
+        p(waiver[7]), reqd(textInput("initial5", "Initials", width = 50)),
+        p(waiver[8]), reqd(textInput("initial6", "Initials", width = 50)),
+        p(waiver[9]), reqd(textInput("initial7", "Initials", width = 50)),
+        p(waiver[10]), reqd(textInput("initial8", "Initials", width = 50)),
+        p(waiver[11]), reqd(textInput("initial9", "Initials", width = 50)),
+        p(waiver[12]), reqd(textInput("initial10", "Initials", width = 50)),
+        p(waiver[13]), reqd(textInput("initial11", "Initials", width = 50)),
+        uiOutput("waiver_agree"),
+        reqd(textInput("waiver_sig", 
+                       "Electronic Signature",
+                       placeholder = "Please type your full name")),
+        uiOutput("valid_page6")
       ),
       
       # --------- SANCTION FEES ---------
@@ -378,9 +430,9 @@ ui <- function(request) {
       tabPanel("Sanction Fees",
         includeMarkdown("sanction_fees.md"),
         
-        radioButtons("payment_choice", "Which method of payment do you plan to use?",
-                     c("Dwolla", "PayPal", "personal check", "wire transfer",
-                       "not sure yet")),
+        selectInput("payment_choice", 
+                    "Which method of payment do you plan to use?",
+                    c("[SELECT]", "Dwolla", "PayPal", "personal check", "wire transfer")),
         
         p("We will send specific instructions along with the invoice."),
         h3("Lifetime Membership"),
@@ -389,21 +441,17 @@ ui <- function(request) {
                      c("Yes", "No")),
         
         hidden(div(id = "new_lifetime",
-          p("SBCSA Lifetime Members are entitled to a $100 discount 
-            on Solo sanction fees, for life, in addition to other 
-            benefits (described here)."),
-          p("Lifetime Membership costs $250 (one time only), 
-            and is tax-deductible for U.S. taxpayers. 
-            The discount is valid immediately, including for this swim."),
-          radioButtons("lifetime_purchase", "Are you interesting in purchasing 
-                       a Lifetime Membership at this time?", c("Yes", "No"))
+          includeMarkdown("lifetime.md"),
+          radioButtons("lifetime_purchase", 
+                       "Are you interesting in purchasing a Lifetime Membership at this time?", 
+                       c("No", "Yes"))
         )),
         
         h3("Cancellation Policy"),
         includeMarkdown("cancel_policy.md"),
         p("I understand the cancellation policy"),
-        
-        checkboxInput("cancel_policy", "Yes")
+        checkboxInput("cancel_policy", "Yes"),
+        uiOutput("valid_page7")
       ),
       
       # --------- PREVIEW PAGE -----------
