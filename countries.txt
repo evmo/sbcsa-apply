@@ -1,4 +1,5 @@
 [SELECT]
+United States
 Afghanistan
 Albania
 Algeria
@@ -185,7 +186,6 @@ Uganda
 Ukraine
 United Arab Emirates
 United Kingdom
-United States
 Uruguay
 Uzbekistan
 Vanuatu
