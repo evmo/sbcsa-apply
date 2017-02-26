@@ -6,16 +6,16 @@ library(rmarkdown)
 library(magrittr)
 
 source("fill_sample.R")
-countries <- readLines("countries.txt")
-islands <- readLines("islands.txt")
-boats <- readLines("boats.txt")
-waiver <- readLines("waiver.txt")
-reqd <- function(input) div(p(class = 'reqd', "* Required"), input)
+countries <- readLines("_includes/countries.txt")
+islands <- readLines("_includes/islands.txt")
+boats <- readLines("_includes/boats.txt")
+waiver <- readLines("_includes/waiver.txt")
+reqd <- function(input) div(class = 'required', input)
 DIR <- if (grepl("dev", getwd())) "~/dev/sbcsa-apply" else "~/sbcsa-apps"
 
 server <- function(input, output, session) {
 
-  rv <- reactiveValues(v = 0, crew_count = 0, swim_count = 0)  
+  rv <- reactiveValues(v = 0)
 
   shinyjs::addClass(class = "disabled-link", 
                     selector = ".nav li:nth-child(9) a,
@@ -45,9 +45,9 @@ server <- function(input, output, session) {
       shinyjs::hide("boat_notify")
 
     if (input$more_background == T) 
-      shinyjs::show("background_details") 
+      shinyjs::show("more_details") 
     else 
-      shinyjs::hide("background_details")
+      shinyjs::hide("more_details")
 
     if (input$current_lifetime == "No") 
       shinyjs::show("new_lifetime") 
@@ -76,25 +76,49 @@ server <- function(input, output, session) {
   })
   
   # insertUI for crew members
+  crew_count <- 0
   observeEvent(input$add_crew, {
-    insertUI(selector = "#add_crew", "afterEnd", ui = tagList(div(
-      column(4, textInput(paste0("crew_name", input$add_crew), "Name")),
-      column(4, textInput(paste0("crew_role", input$add_crew), "Role")),
-      column(4, textInput(paste0("crew_contact", input$add_crew), "Contact Phone or Email"))
+    crew_count <<- crew_count + 1
+    crewid <- paste0('crew', crew_count)
+    insertUI(selector = "#crew", "beforeEnd", ui = tagList(div(id = crewid,
+      column(4, textInput(paste0("crew_name", crew_count), "Name")),
+      column(4, textInput(paste0("crew_role", crew_count), "Role")),
+      column(4, textInput(paste0("crew_contact", crew_count), "Contact Phone or Email"))
     )))
-    rv$crew_count <- rv$crew_count + 1
+  })
+  
+  observeEvent(input$remove_crew, {
+    removeUI(selector = paste0('#crew', crew_count))
+    crew_count <<- crew_count - 1
   })
   
   # insertUI for documented swims
+  swim_count <- 0
   observeEvent(input$add_swim, {
-    insertUI(selector = "#add_swim", "afterEnd", ui = tagList(div(
-      column(2, textInput(paste0("swim_year", input$add_swim), "Year")),
-      column(4, textInput(paste0("swim_name", input$add_swim), "Swim")),
-      column(2, textInput(paste0("swim_dist", input$add_swim), "Distance")),
-      column(2, textInput(paste0("swim_dur", input$add_swim), "Duration")),
-      column(2, textInput(paste0("swim_temp", input$add_swim), "Temp"))
+    swim_count <<- swim_count + 1
+    swimid <- paste0('swim', swim_count)
+    insertUI(selector = "#doc_swims", "beforeEnd", ui = tagList(div(id = swimid,
+      textInput(paste0("swim_name", input$add_swim), 
+                label = paste("Swim", swim_count, "Description"), 
+                width = "100%"),
+      fluidRow(
+        column(2, selectInput(paste0("swim_year", input$add_swim), 
+                              "Year",
+                              choices = seq(2017, 1997))),
+        column(2, textInput(paste0("swim_dist", input$add_swim), "Distance")),
+        column(2, selectInput(paste0("swim_units", input$add_swim), 
+                              "Units",
+                              choices = c("miles", "km"))),
+        column(2, textInput(paste0("swim_hr", input$add_swim), "Hr")),
+        column(2, textInput(paste0("swim_min", input$add_swim), "Min")),
+        column(2, textInput(paste0("swim_temp", input$add_swim), "Temp"))
+      )
     )))
-    rv$swim_count <- rv$swim_count + 1
+  })
+  
+  observeEvent(input$remove_swim, {
+    removeUI(selector = paste0('#swim', swim_count))
+    swim_count <<- swim_count - 1
   })
   
   output$waiver_agree <- renderUI({
@@ -248,13 +272,24 @@ ui <- function(request) {
       tabPanel("Swimmer Info",
         actionButton("fill_sample", "Fill in sample data"),
         reqd(textInput("s_name", "Full Name")),
-        reqd(dateInput("s_dob", "Date of Birth", startview = "year",
-                  min = Sys.Date() - years(100), max = Sys.Date() - 365,
-                  value = Sys.Date() - years(40))),
-        reqd(textInput("s_email", "Email Address")),
-        textInput("s_phone", "Mobile Phone"),
+        fluidRow(
+          column(6, reqd(dateInput("s_dob", "Date of Birth", startview = "year",
+                          min = Sys.Date() - years(100), max = Sys.Date() - 365,
+                          value = Sys.Date() - years(40)))),
+          column(6, reqd(selectInput("s_gender", 
+                                     "Gender",
+                                     choices = c("[SELECT]", "female", "male"),
+                                     selectize = F)))
+        ),
+        fluidRow(
+          column(6, reqd(textInput("s_email", "Email Address"))),
+          column(6, textInput("s_phone", "Mobile Phone"))
+        ),
         reqd(textAreaInput("s_mailing", "Mailing Address", width = 400, height = 125)),
-        reqd(selectInput("s_country", "Country", choices = countries)),
+        reqd(selectInput("s_country", 
+                         "Country", 
+                         choices = countries,
+                         selectize = F)),
         checkboxInput("other_citizen", "Check if you a primary citizen of a 
                                         different country than your residence"),
         hidden(
@@ -283,7 +318,7 @@ ui <- function(request) {
         hidden(
           textInput("route_other", "Please describe your proposed route")
         ),
-        selectInput("boat", "Escort Boat", choices = boats),
+        reqd(selectInput("boat", "Escort Boat", choices = boats, selectize = F)),
         hidden(div(id = "boat_pilot_other",
           textInput("boat_other", "Name of Boat"),
           textInput("pilot_other", "Name of Pilot")
@@ -325,6 +360,8 @@ ui <- function(request) {
             Indicate each crew member's specific role (kayaker,
             feeder, support swimmer, etc.)"),
         actionButton("add_crew", "Add Crew Member"),
+        actionButton("remove_crew", "Delete Crew Member"),
+        div(id = "crew"),
         uiOutput("valid_page3")
       ),
       
@@ -337,27 +374,18 @@ ui <- function(request) {
           English Channel or Catalina Channel, or organized races 
           such as the Semana Nautica 6-Mile."),
         actionButton("add_swim", "Add Documented Swim"),
+        actionButton("remove_swim", "Delete Swim"),
+        div(id = "doc_swims"),
         
         p("You may wish to provide additional information about your 
           swimming background and training -- especially if your documented 
           marathon swimming history is somewhat sparse."),
         p("Provide more details on swimming background?"),
         checkboxInput("more_background", "Yes"),
-        hidden(
-          p("Use the box below to tell us more about your 
-            swimming background and training. Details might include:"),
-          tags$ul(
-            tags$li("How far you swim each week, on average."),
-            tags$li("Major training swims recently completed."),
-            tags$li("Proportion of training you do in open water vs. the pool."),
-            tags$li("Your local body of open water - typical water temps, 
-                    how long you swim at these temps, etc."),
-            tags$li("Your sustainable swimming pace (minutes/seconds per 100m 
-                    for pool swimming, or minutes per statute mile for open water)")
-          ),
+        hidden(div(id = "more_details",
+          includeMarkdown("_includes/more_background.md"),
           textAreaInput("background_details", "Details", width = 400, height = 200)
-        ),
-        
+        )),
         reqd(textAreaInput("feed_plan", "What is your feeding plan? 
                       Product(s)? Frequency? From boat or kayak?",
                       width = 400, height = 125)),
@@ -382,7 +410,7 @@ ui <- function(request) {
       # ---------- HEALTH & MEDICAL CLEARANCE ----------
       
       tabPanel("Health & Medical Clearance",
-        includeMarkdown("medical.md"),
+        includeMarkdown("_includes/medical.md"),
         textAreaInput("health_disclosure", "Health Disclosure",
                       width = 400, height = 125),
         
@@ -428,7 +456,7 @@ ui <- function(request) {
       # --------- SANCTION FEES ---------
       
       tabPanel("Sanction Fees",
-        includeMarkdown("sanction_fees.md"),
+        includeMarkdown("_includes/sanction_fees.md"),
         
         selectInput("payment_choice", 
                     "Which method of payment do you plan to use?",
@@ -441,14 +469,14 @@ ui <- function(request) {
                      c("Yes", "No")),
         
         hidden(div(id = "new_lifetime",
-          includeMarkdown("lifetime.md"),
+          includeMarkdown("_includes/lifetime.md"),
           radioButtons("lifetime_purchase", 
                        "Are you interesting in purchasing a Lifetime Membership at this time?", 
                        c("No", "Yes"))
         )),
         
         h3("Cancellation Policy"),
-        includeMarkdown("cancel_policy.md"),
+        includeMarkdown("_includes/cancel_policy.md"),
         p("I understand the cancellation policy"),
         checkboxInput("cancel_policy", "Yes"),
         uiOutput("valid_page7")

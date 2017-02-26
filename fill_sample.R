@@ -31,10 +31,9 @@ fill_sample <- function(session) {
   updateTextInput(session, 'initial9', value = 'mw')
   updateTextInput(session, 'initial10', value = 'mw')
   updateTextInput(session, 'initial11', value = 'mw')
-  updateCheckboxInput(session, 'waiver_agree', value = 1)
   updateTextInput(session, 'waiver_sig', value = 'Matthew Webb')
+  updateCheckboxInput(session, 'waiver_box', value = 1)
   updateSelectInput(session, 'payment_choice', selected = "PayPal")
   updateRadioButtons(session, 'current_lifetime', selected = "Yes")
   updateCheckboxInput(session, 'cancel_policy', value = 1)
-  
 }
