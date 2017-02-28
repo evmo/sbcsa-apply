@@ -335,7 +335,8 @@ ui <- function(request) {
   fluidPage(useShinyjs(),
     tags$head(
       includeCSS("custom.css"),
-      HTML("<title>SBCSA Solo Swim Sanction Application</title>")
+      HTML("<title>SBCSA Solo Swim Sanction Application</title>"),
+      includeScript("GA.js")
     ),
     
     navlistPanel("Solo Application", id = "navlist",
