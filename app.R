@@ -12,7 +12,8 @@ islands <- readLines("_includes/islands.txt")
 boats <- readLines("_includes/boats.txt")
 waiver <- readLines("_includes/waiver.txt")
 reqd <- function(input) div(class = 'required', input)
-DIR <- if (grepl("dev", getwd())) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
+dev_mode <- function() if (grepl("dev", getwd())) 1 else 0
+DIR <- if (dev_mode()) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
 DATADIR <- file.path(DIR, "data")
 
 server <- function(input, output, session) {
@@ -25,6 +26,8 @@ server <- function(input, output, session) {
   shinyjs::addClass(class = "red", selector = ".nav li:nth-child(12) a")
   
   observe({  # observers for displaying hidden inputs
+
+    if (dev_mode()) shinyjs::show("fill_sample")
 
     if (input$other_citizen == T) 
       shinyjs::show("s_citizenship") 
@@ -72,7 +75,10 @@ server <- function(input, output, session) {
       shinyjs::hide("new_lifetime")
   })
   
-  observeEvent(input$fill_sample, fill_sample(session))
+  observeEvent(input$fill_sample, {
+    if (dev_mode())
+      fill_sample(session)
+  })
   
   # when harbor departure entered, update splash date to match
   observeEvent(input$harbor_date, {
@@ -344,7 +350,7 @@ ui <- function(request) {
       
       tabPanel("The Swimmer",
         h2("The Swimmer"),
-        actionButton("fill_sample", "Fill in sample data"),
+        hidden(actionButton("fill_sample", "Fill in sample data")),
         reqd(textInput("s_name", "Full Name")),
         fluidRow(
           column(6, reqd(dateInput("s_dob", "Date of Birth", startview = "year",
