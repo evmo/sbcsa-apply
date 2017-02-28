@@ -26,3 +26,6 @@
 }
 
 li.navbar-brand { margin-top: 110px; }
+
+.tab-content li { margin-bottom: 10px; }
+.tab-content h2 { border-bottom: 1px solid gray; }
