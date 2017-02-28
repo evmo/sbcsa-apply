@@ -1,6 +1,7 @@
 fill_sample <- function(session) {
   updateTextInput(session, 's_name', value = 'Matthew Webb')
   updateTextInput(session, 's_email', value = 'mwebb@channelswimmingassocation.com')
+  updateSelectInput(session, 's_gender', selected = 'male')
   updateTextInput(session, 's_phone', value = '505-867-5309')
   updateTextAreaInput(session, 's_mailing', value = '121 Main St, Dover, England')
   updateSelectInput(session, 's_country', selected = 'United Kingdom')
@@ -12,6 +13,8 @@ fill_sample <- function(session) {
   updateSelectInput(session, 'boat', selected = 'Tuna Thumper')
   updateTextInput(session, 'cc_name', value = "Tabloid Terry")
   updateTextInput(session, 'cc_email', value = "tterry@hotmail.com")
+  updateCheckboxInput(session, 'more_background', value = 1)
+  updateTextAreaInput(session, 'background_details', value = "Many swims in Dover Harbour")
   updateTextAreaInput(session, 'feed_plan', value = "Maxim with apple juice every 30 mins from kayak")
   updateTextAreaInput(session, 'feed_experience', value = "5 marathon swims in 2 years")
   updateTextInput(session, 'stroke_rate', value = "60")
@@ -32,8 +35,8 @@ fill_sample <- function(session) {
   updateTextInput(session, 'initial10', value = 'mw')
   updateTextInput(session, 'initial11', value = 'mw')
   updateTextInput(session, 'waiver_sig', value = 'Matthew Webb')
-  updateCheckboxInput(session, 'waiver_box', value = 1)
   updateSelectInput(session, 'payment_choice', selected = "PayPal")
   updateRadioButtons(session, 'current_lifetime', selected = "Yes")
   updateCheckboxInput(session, 'cancel_policy', value = 1)
+  updateCheckboxInput(session, 'waiver_box', value = 1)
 }

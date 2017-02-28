@@ -4,6 +4,7 @@ library(knitr)
 library(lubridate)
 library(rmarkdown)
 library(magrittr)
+library(markdown)
 
 source("fill_sample.R")
 countries <- readLines("_includes/countries.txt")
@@ -12,15 +13,16 @@ boats <- readLines("_includes/boats.txt")
 waiver <- readLines("_includes/waiver.txt")
 reqd <- function(input) div(class = 'required', input)
 DIR <- if (grepl("dev", getwd())) "~/dev/sbcsa-apply" else "~/sbcsa-apps"
+DATADIR <- file.path(DIR, "data")
 
 server <- function(input, output, session) {
 
   rv <- reactiveValues(v = 0)
 
   shinyjs::addClass(class = "disabled-link", 
-                    selector = ".nav li:nth-child(9) a,
-                                .nav li:nth-child(10) a")
-  shinyjs::addClass(class = "red", selector = ".nav li:nth-child(11) a")
+                    selector = ".nav li:nth-child(10) a,
+                                .nav li:nth-child(11) a")
+  shinyjs::addClass(class = "red", selector = ".nav li:nth-child(12) a")
   
   observe({  # observers for displaying hidden inputs
 
@@ -44,6 +46,21 @@ server <- function(input, output, session) {
     else
       shinyjs::hide("boat_notify")
 
+    if (rv$crew_count > 0)
+      shinyjs::show("remove_crew")
+    else
+      shinyjs::hide("remove_crew")
+
+    if (rv$swim_count > 0)
+      shinyjs::show("remove_swim")
+    else
+      shinyjs::hide("remove_swim")
+
+    if (rv$swim_count >= 5)
+      shinyjs::hide("add_swim")
+    else
+      shinyjs::show("add_swim")
+
     if (input$more_background == T) 
       shinyjs::show("more_details") 
     else 
@@ -53,19 +70,6 @@ server <- function(input, output, session) {
       shinyjs::show("new_lifetime") 
     else 
       shinyjs::hide("new_lifetime")
-    
-    if (all(is.null( validation1() ), 
-            is.null( validation2() ),
-            is.null( validation3() ),
-            is.null( validation4() ),
-            is.null( validation5() ),
-            is.null( validation6() ),
-            is.null( validation7() ) 
-      )) {
-      shinyjs::removeClass(class = "disabled-link", 
-                           selector = ".nav li:nth-child(9) a,
-                                       .nav li:nth-child(10) a")
-    }
   })
   
   observeEvent(input$fill_sample, fill_sample(session))
@@ -76,30 +80,30 @@ server <- function(input, output, session) {
   })
   
   # insertUI for crew members
-  crew_count <- 0
+  rv$crew_count <- 0
   observeEvent(input$add_crew, {
-    crew_count <<- crew_count + 1
-    crewid <- paste0('crew', crew_count)
+    rv$crew_count <<- rv$crew_count + 1
+    crewid <- paste0('crew', rv$crew_count)
     insertUI(selector = "#crew", "beforeEnd", ui = tagList(div(id = crewid,
-      column(4, textInput(paste0("crew_name", crew_count), "Name")),
-      column(4, textInput(paste0("crew_role", crew_count), "Role")),
-      column(4, textInput(paste0("crew_contact", crew_count), "Contact Phone or Email"))
+      column(4, textInput(paste0("crew_name", rv$crew_count), "Name")),
+      column(4, textInput(paste0("crew_role", rv$crew_count), "Role")),
+      column(4, textInput(paste0("crew_contact", rv$crew_count), "Contact Phone or Email"))
     )))
   })
   
   observeEvent(input$remove_crew, {
-    removeUI(selector = paste0('#crew', crew_count))
-    crew_count <<- crew_count - 1
+    removeUI(selector = paste0('#crew', rv$crew_count))
+    if (rv$crew_count > 0) rv$crew_count <<- rv$crew_count - 1
   })
   
   # insertUI for documented swims
-  swim_count <- 0
+  rv$swim_count <- 0
   observeEvent(input$add_swim, {
-    swim_count <<- swim_count + 1
-    swimid <- paste0('swim', swim_count)
+    rv$swim_count <<- rv$swim_count + 1
+    swimid <- paste0('swim', rv$swim_count)
     insertUI(selector = "#doc_swims", "beforeEnd", ui = tagList(div(id = swimid,
       textInput(paste0("swim_name", input$add_swim), 
-                label = paste("Swim", swim_count, "Description"), 
+                label = paste("Swim", rv$swim_count, "Description"), 
                 width = "100%"),
       fluidRow(
         column(2, selectInput(paste0("swim_year", input$add_swim), 
@@ -117,8 +121,8 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$remove_swim, {
-    removeUI(selector = paste0('#swim', swim_count))
-    swim_count <<- swim_count - 1
+    removeUI(selector = paste0('#swim', rv$swim_count))
+    if (rv$swim_count > 0) rv$swim_count <<- rv$swim_count - 1
   })
   
   output$waiver_agree <- renderUI({
@@ -143,16 +147,21 @@ server <- function(input, output, session) {
            "Please enter a valid email address"),
       need(input$s_mailing != "", "Please enter a mailing address"),
       need(input$s_country != "[SELECT]", "Please select a country"),
+      need(input$other_citizen == F | input$s_citizenship != "[SELECT]",
+            "Please select a country of citizenship"),
       need(input$ec_name != "", "Please list an emergency contact")
     )
   }
   
   output$valid_page1 <- renderUI(validation1())
   
-  validation2 <- function(page) {
+  validation2 <- function() {
     validate(
       need(input$boat != "[SELECT]",
-           "Please select a boat")
+           "Please select a boat"),
+      need(input$route == "Anacapa to mainland" | 
+        (input$route == "some other route" & input$route_other != ""),
+            "Please describe the route")
     )
   }
   
@@ -160,8 +169,7 @@ server <- function(input, output, session) {
   
   validation3 <- function() {
     validate(
-      need(input$cc_name != "", 
-           "Crew chief required")
+      need(input$cc_name != "", "Please enter a crew chief")
     )
   }
   
@@ -169,18 +177,24 @@ server <- function(input, output, session) {
   
   validation4 <- function() {
     validate(
+      need(nchar(input$background_details) > 0 |
+        (!is.null(input$swim_name1) && 
+            input$swim_name1 != "" &&
+            input$swim_dist1 != ""),
+        "Need swim background"
+      ),
       need(input$feed_plan != "", 
-           "Feed plan is blank"),
+           "Please enter a feed plan"),
       need(input$feed_experience != "", 
-           "Feed experience is blank"),
+           "Please enter experience with feed plan"),
       need(input$stroke_rate != "", 
-           "Stroke rate is blank"),
-      need(input$breathing != "", 
-           "Breathing pattern is blank"),
+           "Please enter stroke rate"),
+      need(input$breathing != "[SELECT]",
+           "Please select a breathing pattern"),
       need(input$hypothermia != "", 
-           "Hypothermia experience is blank"),
+           "Please enter hypothermia experience"),
       need(input$night_swimming != "", 
-           "Night swimming experience is blank")
+           "Please enter night swimming experience")
     )
   }
   
@@ -208,7 +222,7 @@ server <- function(input, output, session) {
       need(input$initial9 != "", "Please initial item #9"),
       need(input$initial10 != "", "Please initial item #10"),
       need(input$initial11 != "", "Please initial item #11"),
-      need(input$waiver_box,      "Please check the box"),
+      # need(input$waiver_box,      "Please check the box"),
       need(input$waiver_sig != "", "Signature is required")
     )
   }
@@ -224,49 +238,100 @@ server <- function(input, output, session) {
 
   output$valid_page7 <- renderUI(validation7())
 
+  observe({
+    if (all(is.null( validation1() ), 
+            is.null( validation2() ),
+            is.null( validation3() ),
+            is.null( validation4() ),
+            is.null( validation5() ),
+            is.null( validation6() ),
+            is.null( validation7() ) 
+      )) {
+      shinyjs::removeClass(
+        class = "disabled-link", 
+        selector = ".nav li:nth-child(10) a"
+      )}
+  })
+
   outFile <- reactiveFileReader(1000, session, "output.md", readLines)
   
   output$preview <- renderUI({
     rv$v
-    includeMarkdown("output.md")
+    includeHTML("data/output.html")
   })
 
   observeEvent(input$gen_markdown, {
-    out <- knit_expand("template.md")
-    writeLines(out, "output.md")
+    out <- knit_expand("template.md")  # expand R expressions in template
+    writeLines(out, "data/output.md")  # write markdown file
+    markdownToHTML(text = out,         # convert to HTML file
+                   output = file.path(DATADIR, "output.html"),
+                   stylesheet = "output.css")
     rv$v <- rv$v + 1
     shinyjs::show("preview")
     shinyjs::show("draw_sig")
     shinyjs::show("submit_button")
+    shinyjs::removeClass(
+        class = "disabled-link", 
+        selector = ".nav li:nth-child(11) a"
+    )
   })
 
   observeEvent(input$submit_app, {
-    # system("php ./sig.php")
-    file_name <- gsub(" ", "_", input$s_name) %>% tolower %>% paste0(".md")
-    file.copy("output.md", file.path(DIR, file_name))
-    # rmarkdown::render(input = "output.md", 
-    #                   output_format = "pdf_document",
-    #                   output_file = file_name,
-    #                   output_dir = DIR)
-    shinyjs::show("download")
+    shinyjs::disable("submit_app")
+    shinyjs::show("submit_msg")
+    shinyjs::hide("error")
+    tryCatch({
+      file_name <- gsub(" ", "_", input$s_name) %>% tolower 
+      file_md <- paste0(file_name, ".md")
+      rv$file_pdf <- paste0(file_name, ".pdf")
+      file.copy("data/output.md", file.path(DATADIR, file_md))
+      system(paste("wkhtmltopdf", 
+                   file.path(DATADIR, "output.html"),
+                   file.path(DATADIR, rv$file_pdf)))
+    },
+    error = function(err) {
+      shinyjs::html("error_msg", err$message)
+      shinyjs::show(id = "error", anim = TRUE, animType = "fade")
+    },
+    finally = {
+      shinyjs::hide("submit_app")
+      shinyjs::hide("submit_msg")
+      shinyjs::show("download_next_steps")
+      shinyjs::addClass(
+        class = "disabled-link", 
+        selector = ".nav li:nth-child(2) a,
+                    .nav li:nth-child(3) a,
+                    .nav li:nth-child(4) a,
+                    .nav li:nth-child(5) a,
+                    .nav li:nth-child(6) a,
+                    .nav li:nth-child(7) a,
+                    .nav li:nth-child(8) a,
+                    .nav li:nth-child(9) a,
+                    .nav li:nth-child(10) a,
+                    .nav li:nth-child(12) a"
+      )
+    }
+    )
   })
   
   output$download <- downloadHandler(
     filename = "SBSCA_sanction_app.pdf",
-    content = file.path(DIR, 
-                        tolower(gsub(" ", "_", input$s_name)))
+    content <- function(file) file.copy(file.path(DATADIR, rv$file_pdf), file)
   )
 }
 
 ui <- function(request) {
   fluidPage(useShinyjs(),
-    tags$head(
-      includeCSS("custom.css")
-    ),
+    tags$head(includeCSS("custom.css")),
     
-    titlePanel("SBCSA"),
     navlistPanel("Solo Application",
         
+      # -------- INSTRUCTIONS -------------
+
+      tabPanel("Instructions",
+        includeMarkdown("_includes/instructions.md")
+      ),
+
       # -------- THE SWIMMER -------------
       
       tabPanel("Swimmer Info",
@@ -360,7 +425,7 @@ ui <- function(request) {
             Indicate each crew member's specific role (kayaker,
             feeder, support swimmer, etc.)"),
         actionButton("add_crew", "Add Crew Member"),
-        actionButton("remove_crew", "Delete Crew Member"),
+        hidden(actionButton("remove_crew", "Delete Crew Member")),
         div(id = "crew"),
         uiOutput("valid_page3")
       ),
@@ -368,13 +433,9 @@ ui <- function(request) {
       # -------- MARATHON SWIMMING BACKGROUND --------
       
       tabPanel("Marathon Swimming Background",
-        p("Please list up to five documented marathon swims you have completed, 
-          especially swims from the past 1-3 years."),
-        p("These should be observed, sanctioned solo swims such as the 
-          English Channel or Catalina Channel, or organized races 
-          such as the Semana Nautica 6-Mile."),
+        p("Please list up to five documented marathon swims you have completed, especially swims from the past 1-3 years."),
         actionButton("add_swim", "Add Documented Swim"),
-        actionButton("remove_swim", "Delete Swim"),
+        hidden(actionButton("remove_swim", "Delete Swim")),
         div(id = "doc_swims"),
         
         p("You may wish to provide additional information about your 
@@ -395,7 +456,7 @@ ui <- function(request) {
         reqd(textInput("stroke_rate", "What is your typical stroke rate 
                   for a swim of this distance (strokes per minute)?")),
         reqd(selectInput("breathing", "What is your breathing pattern?",
-                    c("right only", "left only", "mostly right, but can
+                    c("[SELECT]", "right only", "left only", "mostly right, but can
                       breathe bilateral", "mostly left, but can breathe 
                       bilateral", "bilateral"))),
         reqd(textAreaInput("hypothermia", "What is your experience (if any) 
@@ -493,14 +554,22 @@ ui <- function(request) {
       
       tabPanel("SUBMIT",
         actionButton("submit_app", "SUBMIT APPLICATION"),
-        hidden(downloadButton("download"))
+        hidden(
+          span(id = "submit_msg", "Submitting..."),
+          div(id = "error", 
+              div(br(), tags$b("Error: "), span(id = "error_msg"))
+        )),
+        hidden(div(id = "download_next_steps",
+          h4("Application submitted. If you would like to download a copy
+            for your records, please click this button:"),
+          downloadButton("download"),
+          includeMarkdown("_includes/next_steps.md")
+        ))
       ),
       
       # --------- SAVE & RETURN -----------
       
-      tabPanel("Save & Return Later",
-               bookmarkButton()
-      )
+      tabPanel("Save & Return Later", bookmarkButton())
     )
   )
 }

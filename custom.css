@@ -1,18 +1,3 @@
-.signature-pad {
-  width: 500px;
-  height: 300px;
-}
-
-.wrapper {
-  position: relative;
-  width: 500px;
-  height: 300px;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
 .disabled-link {
    pointer-events: none;
    cursor: default;
@@ -26,3 +11,6 @@
 .required input { border: 1px dashed red; }
 .required textArea { border: 1px dashed red; }
 .required select { border: 1px dashed red; }
+
+#valid_page1, #valid_page2, #valid_page3, #valid_page4, 
+#valid_page5, #valid_page6, #valid_page7 { color: red; }
