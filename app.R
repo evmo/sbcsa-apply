@@ -231,8 +231,12 @@ server <- function(input, output, session) {
 
   validation7 <- function() {
     validate(
-      need(input$payment_choice != "[SELECT]", "Please select a payment method"),
-      need(input$cancel_policy, "Please check the box that you understand the cancellation policy")
+      need(input$payment_choice != "[SELECT]", 
+            "Please select a payment method"),
+      need(input$current_lifetime != "[SELECT]", 
+            "Please indicate your lifetime member status"),
+      need(input$cancel_policy, 
+            "Please check the box that you understand the cancellation policy")
     )
   }
 
@@ -254,18 +258,19 @@ server <- function(input, output, session) {
       shinyjs::addClass(class = "green", selector = ".nav li:nth-child(10) a")
   })
 
-  outFile <- reactiveFileReader(1000, session, "output.md", readLines)
-  
-  output$preview <- renderUI({
-    rv$v
-    includeHTML("data/output.html")
+  # construct output file paths
+  observe({
+    rv$fn <- gsub(" ", "_", input$s_name) %>% tolower
+    rv$file_md <- file.path(DATADIR, paste0(rv$fn, ".md"))
+    rv$file_html <- file.path(DATADIR, paste0(rv$fn, ".html"))
+    rv$file_pdf <- file.path(DATADIR, paste0(rv$fn, ".pdf"))
   })
 
   observeEvent(input$gen_markdown, {
     out <- knit_expand("template.md")  # expand R expressions in template
-    writeLines(out, "data/output.md")  # write markdown file
-    markdownToHTML(text = out,         # convert to HTML file
-                   output = file.path(DATADIR, "output.html"),
+    writeLines(out, rv$file_md)
+    markdownToHTML(text = out, 
+                   output = rv$file_html,
                    stylesheet = "output.css")
     rv$v <- rv$v + 1
     shinyjs::show("preview")
@@ -278,18 +283,17 @@ server <- function(input, output, session) {
     shinyjs::addClass(class = "green", selector = ".nav li:nth-child(11) a")
   })
 
+  output$preview <- renderUI({
+    rv$v
+    includeHTML(rv$file_html)
+  })
+
   observeEvent(input$submit_app, {
     shinyjs::disable("submit_app")
     shinyjs::show("submit_msg")
     shinyjs::hide("error")
     tryCatch({
-      file_name <- gsub(" ", "_", input$s_name) %>% tolower 
-      file_md <- paste0(file_name, ".md")
-      rv$file_pdf <- paste0(file_name, ".pdf")
-      file.copy("data/output.md", file.path(DATADIR, file_md))
-      system(paste("wkhtmltopdf", 
-                   file.path(DATADIR, "output.html"),
-                   file.path(DATADIR, rv$file_pdf)))
+      system(paste("wkhtmltopdf", rv$file_html, rv$file_pdf))
     },
     error = function(err) {
       shinyjs::html("error_msg", err$message)
@@ -312,19 +316,21 @@ server <- function(input, output, session) {
                     .nav li:nth-child(10) a,
                     .nav li:nth-child(12) a"
       )
-    }
-    )
+    })
   })
   
   output$download <- downloadHandler(
     filename = "SBSCA_sanction_app.pdf",
-    content <- function(file) file.copy(file.path(DATADIR, rv$file_pdf), file)
+    content <- function(file) file.copy(rv$file_pdf, file)
   )
 }
 
 ui <- function(request) {
   fluidPage(useShinyjs(),
-    tags$head(includeCSS("custom.css")),
+    tags$head(
+      includeCSS("custom.css"),
+      HTML("<title>SBCSA Solo Swim Sanction Application</title>")
+    ),
     
     navlistPanel("Solo Application", id = "navlist",
         
@@ -336,8 +342,8 @@ ui <- function(request) {
 
       # -------- THE SWIMMER -------------
       
-      tabPanel("Swimmer Info",
-        h2("Swimmer Info"),
+      tabPanel("The Swimmer",
+        h2("The Swimmer"),
         actionButton("fill_sample", "Fill in sample data"),
         reqd(textInput("s_name", "Full Name")),
         fluidRow(
@@ -354,12 +360,19 @@ ui <- function(request) {
           column(6, textInput("s_phone", "Mobile Phone"))
         ),
         reqd(textAreaInput("s_mailing", "Mailing Address", width = 400, height = 125)),
-        reqd(selectInput("s_country", 
-                         "Country", 
-                         choices = countries,
-                         selectize = F)),
-        checkboxInput("other_citizen", "Check if you a primary citizen of a 
-                                        different country than your residence"),
+        fluidRow(
+          column(6, 
+            reqd(selectInput("s_country", 
+                              "Country", 
+                               choices = countries,
+                               selectize = F))
+          ),
+          column(6, 
+            checkboxInput("other_citizen", width = "100%",
+                          label = "Check if you a primary citizen of a 
+                                   different country than your residence")
+          )
+        ),
         hidden(
           selectInput("s_citizenship", "Citizenship", choices = countries)
         ),
@@ -443,7 +456,7 @@ ui <- function(request) {
         actionButton("add_swim", "Add Documented Swim"),
         hidden(actionButton("remove_swim", "Delete Swim")),
         div(id = "doc_swims"),
-        
+        hr(),
         p("You may wish to provide additional information about your 
           swimming background and training -- especially if your documented 
           marathon swimming history is somewhat sparse."),
@@ -529,20 +542,25 @@ ui <- function(request) {
         includeMarkdown("_includes/sanction_fees.md"),
         
         selectInput("payment_choice", 
-                    "Which method of payment do you prefer?",
-                    c("[SELECT]", "Dwolla", "PayPal", "personal check", "wire transfer")),
+                    label = "Which method of payment do you prefer?",
+                    choices = c("[SELECT]", "Dwolla", "PayPal", 
+                                "personal check", "wire transfer")
+        ),
         
         p("We will send specific instructions along with the invoice."),
+        
         h3("Lifetime Membership"),
-        
-        radioButtons("current_lifetime", "Are you currently a SBCSA Lifetime Member?",
-                     c("Yes", "No")),
-        
+        selectInput("current_lifetime", 
+                    label = "Are you currently a SBCSA Lifetime Member?",
+                    choices = c("[SELECT]", "No", "Yes")
+        ),
         hidden(div(id = "new_lifetime",
           includeMarkdown("_includes/lifetime.md"),
           radioButtons("lifetime_purchase", 
-                       "Are you interesting in purchasing a Lifetime Membership at this time?", 
-                       c("No", "Yes"))
+                       label = "Are you interesting in purchasing a 
+                                Lifetime Membership at this time?", 
+                       choices = c("No", "Yes")
+          )
         )),
         
         h3("Cancellation Policy"),
@@ -566,8 +584,8 @@ ui <- function(request) {
       # --------- SUBMIT APP -----------
       
       tabPanel("SUBMIT",
-        h2("SUBMIT"),
-        actionButton("submit_app", "SUBMIT APPLICATION"),
+        h2("Submit Application"),
+        actionButton("submit_app", "SUBMIT"),
         hidden(
           span(id = "submit_msg", "Submitting..."),
           div(id = "error", 
