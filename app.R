@@ -251,6 +251,7 @@ server <- function(input, output, session) {
         class = "disabled-link", 
         selector = ".nav li:nth-child(10) a"
       )}
+      shinyjs::addClass(class = "green", selector = ".nav li:nth-child(10) a")
   })
 
   outFile <- reactiveFileReader(1000, session, "output.md", readLines)
@@ -274,6 +275,7 @@ server <- function(input, output, session) {
         class = "disabled-link", 
         selector = ".nav li:nth-child(11) a"
     )
+    shinyjs::addClass(class = "green", selector = ".nav li:nth-child(11) a")
   })
 
   observeEvent(input$submit_app, {
@@ -324,7 +326,7 @@ ui <- function(request) {
   fluidPage(useShinyjs(),
     tags$head(includeCSS("custom.css")),
     
-    navlistPanel("Solo Application",
+    navlistPanel("2017 Solo Application", id = "navlist",
         
       # -------- INSTRUCTIONS -------------
 
@@ -335,6 +337,7 @@ ui <- function(request) {
       # -------- THE SWIMMER -------------
       
       tabPanel("Swimmer Info",
+        h2("Swimmer Info"),
         actionButton("fill_sample", "Fill in sample data"),
         reqd(textInput("s_name", "Full Name")),
         fluidRow(
@@ -377,6 +380,7 @@ ui <- function(request) {
       # ----------- THE SWIM --------------
       
       tabPanel("The Swim",
+        h2("The Swim"),
         radioButtons("route", "What route will you be swimming?", 
           choices = c("Anacapa to mainland", "some other route")
         ),
@@ -415,6 +419,7 @@ ui <- function(request) {
       # -------- SUPPORT TEAM ---------------
       
       tabPanel("Support Team",
+        h2("Support Team"),
         h4("Crew Chief"),
         p("Who will be your lead support person on the boat?"),
         reqd(textInput("cc_name", "Name")),
@@ -432,7 +437,8 @@ ui <- function(request) {
       
       # -------- MARATHON SWIMMING BACKGROUND --------
       
-      tabPanel("Marathon Swimming Background",
+      tabPanel("Swim Experience",
+        h2("Swim Experience"),
         p("Please list up to five documented marathon swims you have completed, especially swims from the past 1-3 years."),
         actionButton("add_swim", "Add Documented Swim"),
         hidden(actionButton("remove_swim", "Delete Swim")),
@@ -470,7 +476,8 @@ ui <- function(request) {
       
       # ---------- HEALTH & MEDICAL CLEARANCE ----------
       
-      tabPanel("Health & Medical Clearance",
+      tabPanel("Medical Clearance",
+        h2("Medical Clearance"),
         includeMarkdown("_includes/medical.md"),
         textAreaInput("health_disclosure", "Health Disclosure",
                       width = 400, height = 125),
@@ -493,7 +500,8 @@ ui <- function(request) {
       
       # ------ WAIVER & RELEASE OF LIABILITY ---------
       
-      tabPanel("Waiver & Release of Liability",
+      tabPanel("Liability Waiver",
+        h2("Liability Waiver"),
         h5(waiver[1]), hr(),
         p(waiver[2]), 
         p(waiver[3]), reqd(textInput("initial1", "Initials", width = 50)),
@@ -517,6 +525,7 @@ ui <- function(request) {
       # --------- SANCTION FEES ---------
       
       tabPanel("Sanction Fees",
+        h2("Sanction Fees"),
         includeMarkdown("_includes/sanction_fees.md"),
         
         selectInput("payment_choice", 
@@ -545,7 +554,11 @@ ui <- function(request) {
       
       # --------- PREVIEW PAGE -----------
       
-      tabPanel("Preview Application Submission",
+      tabPanel("PREVIEW",
+        h2("Preview"), 
+        p("If you change any data in the previous tabs,
+          you can re-generate the preview."),
+        hr(),
         actionButton("gen_markdown", "Generate Preview"),
         hidden(uiOutput("preview"))
       ),
@@ -553,6 +566,7 @@ ui <- function(request) {
       # --------- SUBMIT APP -----------
       
       tabPanel("SUBMIT",
+        h2("SUBMIT"),
         actionButton("submit_app", "SUBMIT APPLICATION"),
         hidden(
           span(id = "submit_msg", "Submitting..."),

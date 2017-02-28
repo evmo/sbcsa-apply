@@ -4,7 +4,8 @@
    color: gray;
 }
 
-.red { color:red; font-weight: bold; }
+.red { color: red; font-weight: bold; }
+.green { color: green; font-weight: bold; }
 
 .big { font-size: 1000%; }
 
@@ -13,4 +14,15 @@
 .required select { border: 1px dashed red; }
 
 #valid_page1, #valid_page2, #valid_page3, #valid_page4, 
-#valid_page5, #valid_page6, #valid_page7 { color: red; }
+#valid_page5, #valid_page6, #valid_page7 { 
+  color: red; 
+  margin-top: 10px;
+}
+
+#navlist { 
+  background-image: url("red200.png");
+  background-repeat: no-repeat;
+  background-position: center top;
+}
+
+li.navbar-brand { margin-top: 110px; }
