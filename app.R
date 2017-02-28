@@ -12,7 +12,7 @@ islands <- readLines("_includes/islands.txt")
 boats <- readLines("_includes/boats.txt")
 waiver <- readLines("_includes/waiver.txt")
 reqd <- function(input) div(class = 'required', input)
-DIR <- if (grepl("dev", getwd())) "~/dev/sbcsa-apply" else "~/sbcsa"
+DIR <- if (grepl("dev", getwd())) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
 DATADIR <- file.path(DIR, "data")
 
 server <- function(input, output, session) {
