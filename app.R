@@ -587,5 +587,5 @@ ui <- function(request) {
     )
   )
 }
-
-shinyApp(ui = ui, server = server, enableBookmarking = "server")
+enableBookmarking(store = "server")
+shinyApp(ui = ui, server = server)
