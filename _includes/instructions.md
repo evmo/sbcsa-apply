@@ -1,8 +1,10 @@
 ## Instructions
 
-- Enter the requested information on each page: (1) Swimmer Info, (2) The Swim, (3) Support Team, (4) Swim Experience, (5) Medical Clearance, (6) Liability Waiver, and (8) Sanction Fees.
+#### Welcome to the Santa Barbara Channel Swimming Association application for sanction.
+
+- Please enter the requested information on each page: (1) Swimmer Info, (2) The Swim, (3) Support Team, (4) Swim Experience, (5) Medical Clearance, (6) Liability Waiver, and (8) Sanction Fees.
 - Required fields are outlined in red. Example: ![](required.png)
-- Red text at bottom provides feedback about required fields on that page that are not complete. Example: 
+- Red text at bottom of each page provides feedback about incomplete fields. Example: 
 
 <img src="validation.png" style="margin-left:40px;" />
 

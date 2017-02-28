@@ -326,7 +326,7 @@ ui <- function(request) {
   fluidPage(useShinyjs(),
     tags$head(includeCSS("custom.css")),
     
-    navlistPanel("2017 Solo Application", id = "navlist",
+    navlistPanel("Solo Application", id = "navlist",
         
       # -------- INSTRUCTIONS -------------
 
@@ -529,7 +529,7 @@ ui <- function(request) {
         includeMarkdown("_includes/sanction_fees.md"),
         
         selectInput("payment_choice", 
-                    "Which method of payment do you plan to use?",
+                    "Which method of payment do you prefer?",
                     c("[SELECT]", "Dwolla", "PayPal", "personal check", "wire transfer")),
         
         p("We will send specific instructions along with the invoice."),
