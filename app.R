@@ -583,7 +583,12 @@ ui <- function(request) {
       
       # --------- SAVE & RETURN -----------
       
-      tabPanel("Save & Return Later", bookmarkButton())
+      tabPanel("Save & Return Later", 
+        p("Click to save your data and return later."),
+        p("A small window will pop up - copy the URL to your computer.
+           To return to your application, enter this URL into your browser."),
+        bookmarkButton()
+      )
     )
   )
 }
