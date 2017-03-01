@@ -7,10 +7,10 @@ library(magrittr)
 library(markdown)
 
 source("fill_sample.R")
-countries <- readLines("_includes/countries.txt")
-islands <- readLines("_includes/islands.txt")
-boats <- readLines("_includes/boats.txt")
-waiver <- readLines("_includes/waiver.txt")
+countries <- readLines("../_includes/countries.txt")
+islands <- readLines("../_includes/islands.txt")
+boats <- readLines("../_includes/boats.txt")
+waiver <- readLines("../_includes/waiver.txt")
 reqd <- function(input) div(class = 'required', input)
 dev_mode <- function() if (grepl("dev", getwd())) 1 else 0
 DIR <- if (dev_mode()) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
@@ -277,7 +277,7 @@ server <- function(input, output, session) {
     writeLines(out, rv$file_md)
     markdownToHTML(text = out, 
                    output = rv$file_html,
-                   stylesheet = "output.css")
+                   stylesheet = "../output.css")
     rv$v <- rv$v + 1
     shinyjs::show("preview")
     shinyjs::show("draw_sig")
@@ -334,9 +334,9 @@ server <- function(input, output, session) {
 ui <- function(request) {
   fluidPage(useShinyjs(),
     tags$head(
-      includeCSS("custom.css"),
+      includeCSS("../custom.css"),
       HTML("<title>SBCSA Solo Swim Sanction Application</title>"),
-      includeScript("GA.js")
+      includeScript("../GA.js")
     ),
     
     navlistPanel("Solo Application", id = "navlist",
@@ -344,7 +344,7 @@ ui <- function(request) {
       # -------- INSTRUCTIONS -------------
 
       tabPanel("Instructions",
-        includeMarkdown("_includes/instructions.md")
+        includeMarkdown("../_includes/instructions.md")
       ),
 
       # -------- THE SWIMMER -------------
@@ -470,7 +470,7 @@ ui <- function(request) {
         p("Provide more details on swimming background?"),
         checkboxInput("more_background", "Yes"),
         hidden(div(id = "more_details",
-          includeMarkdown("_includes/more_background.md"),
+          includeMarkdown("../_includes/more_background.md"),
           textAreaInput("background_details", "Details", width = 400, height = 200)
         )),
         reqd(textAreaInput("feed_plan", "What is your feeding plan? 
@@ -498,7 +498,7 @@ ui <- function(request) {
       
       tabPanel("Medical Clearance",
         h2("Medical Clearance"),
-        includeMarkdown("_includes/medical.md"),
+        includeMarkdown("../_includes/medical.md"),
         textAreaInput("health_disclosure", "Health Disclosure",
                       width = 400, height = 125),
         
@@ -546,7 +546,7 @@ ui <- function(request) {
       
       tabPanel("Sanction Fees",
         h2("Sanction Fees"),
-        includeMarkdown("_includes/sanction_fees.md"),
+        includeMarkdown("../_includes/sanction_fees.md"),
         
         selectInput("payment_choice", 
                     label = "Which method of payment do you prefer?",
@@ -562,7 +562,7 @@ ui <- function(request) {
                     choices = c("[SELECT]", "No", "Yes")
         ),
         hidden(div(id = "new_lifetime",
-          includeMarkdown("_includes/lifetime.md"),
+          includeMarkdown("../_includes/lifetime.md"),
           radioButtons("lifetime_purchase", width = "100%",
                        label = "Are you interesting in purchasing a 
                                 Lifetime Membership at this time?", 
@@ -571,7 +571,7 @@ ui <- function(request) {
         )),
         
         h3("Cancellation Policy"),
-        includeMarkdown("_includes/cancel_policy.md"),
+        includeMarkdown("../_includes/cancel_policy.md"),
         p("I understand the cancellation policy"),
         checkboxInput("cancel_policy", "Yes"),
         uiOutput("valid_page7")
@@ -602,7 +602,7 @@ ui <- function(request) {
           h4("Application submitted. If you would like to download a copy
             for your records, please click this button:"),
           downloadButton("download"),
-          includeMarkdown("_includes/next_steps.md")
+          includeMarkdown("../_includes/next_steps.md")
         ))
       ),
       
