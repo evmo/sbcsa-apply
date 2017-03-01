@@ -557,13 +557,13 @@ ui <- function(request) {
         p("We will send specific instructions along with the invoice."),
         
         h3("Lifetime Membership"),
-        selectInput("current_lifetime", 
+        selectInput("current_lifetime",
                     label = "Are you currently a SBCSA Lifetime Member?",
                     choices = c("[SELECT]", "No", "Yes")
         ),
         hidden(div(id = "new_lifetime",
           includeMarkdown("_includes/lifetime.md"),
-          radioButtons("lifetime_purchase", 
+          radioButtons("lifetime_purchase", width = "100%",
                        label = "Are you interesting in purchasing a 
                                 Lifetime Membership at this time?", 
                        choices = c("No", "Yes")
