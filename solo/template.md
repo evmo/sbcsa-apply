@@ -53,11 +53,11 @@ Name | Role | Contact
 
 Year | Swim | Distance | Duration | Temp
 ---- | ---- | -------- | -------- | ----
-{{input$swim_year1}} | {{input$swim_name1}} | {{input$swim_dist1}} | {{input$swim_dur1}} | {{input$swim_temp1}}
-{{input$swim_year2}} | {{input$swim_name2}} | {{input$swim_dist2}} | {{input$swim_dur2}} | {{input$swim_temp2}}
-{{input$swim_year3}} | {{input$swim_name3}} | {{input$swim_dist3}} | {{input$swim_dur3}} | {{input$swim_temp3}}
-{{input$swim_year4}} | {{input$swim_name4}} | {{input$swim_dist4}} | {{input$swim_dur4}} | {{input$swim_temp4}}
-{{input$swim_year5}} | {{input$swim_name5}} | {{input$swim_dist5}} | {{input$swim_dur5}} | {{input$swim_temp5}}
+{{input$swim_year1}} | {{input$swim_name1}} | {{input$swim_dist1}} {{input$swim_units1}} | {{input$swim_dur1}} | {{input$swim_temp1}}
+{{input$swim_year2}} | {{input$swim_name2}} | {{input$swim_dist2}} {{input$swim_units2}} | {{input$swim_dur2}} | {{input$swim_temp2}}
+{{input$swim_year3}} | {{input$swim_name3}} | {{input$swim_dist3}} {{input$swim_units3}} | {{input$swim_dur3}} | {{input$swim_temp3}}
+{{input$swim_year4}} | {{input$swim_name4}} | {{input$swim_dist4}} {{input$swim_units4}} | {{input$swim_dur4}} | {{input$swim_temp4}}
+{{input$swim_year5}} | {{input$swim_name5}} | {{input$swim_dist5}} {{input$swim_units5}} | {{input$swim_dur5}} | {{input$swim_temp5}}
 
 #### More Details
 
