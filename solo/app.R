@@ -80,6 +80,17 @@ server <- function(input, output, session) {
       fill_sample(session)
   })
   
+  output$dobD_ui <- renderUI({
+    if (input$dobM %in% c(4, 6, 9, 11))
+      d <- 30
+    else if (input$dobM == 2)
+      d <- 29
+    else
+      d <- 31
+    
+    reqd(selectInput("dobD", "Day", choices = seq(1, d), selectize = F))
+  })
+  
   # when harbor departure entered, update splash date to match
   observeEvent(input$harbor_date, {
     updateDateInput(session, "splash_date", value = input$harbor_date)
@@ -354,9 +365,22 @@ ui <- function(request) {
         hidden(actionButton("fill_sample", "Fill in sample data")),
         reqd(textInput("s_name", "Full Name")),
         fluidRow(
-          column(6, reqd(dateInput("s_dob", "Date of Birth", startview = "year",
-                          min = Sys.Date() - years(100), max = Sys.Date() - 365,
-                          value = Sys.Date() - years(40)))),
+          column(6, fluidRow(
+            column(4,
+               reqd(selectInput("dobY", "Year", 
+                                choices = seq(year(Sys.Date()) - 14, 
+                                              year(Sys.Date()) - 100),
+                                selectize = F))
+            ),
+            column(4,
+               reqd(selectInput("dobM", "Month", 
+                                choices = seq(1, 12), 
+                                selectize = F))
+            ),
+            column(4,
+              uiOutput("dobD_ui")
+            )
+          )),
           column(6, reqd(selectInput("s_gender", 
                                      "Gender",
                                      choices = c("[SELECT]", "female", "male"),
@@ -524,17 +548,17 @@ ui <- function(request) {
         h2("Liability Waiver"),
         h5(waiver[1]), hr(),
         p(waiver[2]), 
-        p(waiver[3]), reqd(textInput("initial1", "Initials", width = 50)),
-        p(waiver[4]), reqd(textInput("initial2", "Initials", width = 50)),
-        p(waiver[5]), reqd(textInput("initial3", "Initials", width = 50)),
-        p(waiver[6]), reqd(textInput("initial4", "Initials", width = 50)),
-        p(waiver[7]), reqd(textInput("initial5", "Initials", width = 50)),
-        p(waiver[8]), reqd(textInput("initial6", "Initials", width = 50)),
-        p(waiver[9]), reqd(textInput("initial7", "Initials", width = 50)),
-        p(waiver[10]), reqd(textInput("initial8", "Initials", width = 50)),
-        p(waiver[11]), reqd(textInput("initial9", "Initials", width = 50)),
-        p(waiver[12]), reqd(textInput("initial10", "Initials", width = 50)),
-        p(waiver[13]), reqd(textInput("initial11", "Initials", width = 50)),
+        p(waiver[3]), reqd(textInput("initial1", "Initials", width = 70)),
+        p(waiver[4]), reqd(textInput("initial2", "Initials", width = 70)),
+        p(waiver[5]), reqd(textInput("initial3", "Initials", width = 70)),
+        p(waiver[6]), reqd(textInput("initial4", "Initials", width = 70)),
+        p(waiver[7]), reqd(textInput("initial5", "Initials", width = 70)),
+        p(waiver[8]), reqd(textInput("initial6", "Initials", width = 70)),
+        p(waiver[9]), reqd(textInput("initial7", "Initials", width = 70)),
+        p(waiver[10]), reqd(textInput("initial8", "Initials", width = 70)),
+        p(waiver[11]), reqd(textInput("initial9", "Initials", width = 70)),
+        p(waiver[12]), reqd(textInput("initial10", "Initials", width = 70)),
+        p(waiver[13]), reqd(textInput("initial11", "Initials", width = 70)),
         uiOutput("waiver_agree"),
         reqd(textInput("waiver_sig", 
                        "Electronic Signature",
