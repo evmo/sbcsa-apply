@@ -43,21 +43,21 @@ Name | Relationship | Email | Phone |
 
 Name | Role | Contact
 ---- | ---- | -------
-{{input$crew_name1}} | {{input$crew_role1}} | {{input$crew_contact1}}
-{{input$crew_name2}} | {{input$crew_role2}} | {{input$crew_contact2}}
-{{input$crew_name3}} | {{input$crew_role3}} | {{input$crew_contact3}}
-{{input$crew_name4}} | {{input$crew_role4}} | {{input$crew_contact4}}
-{{input$crew_name5}} | {{input$crew_role5}} | {{input$crew_contact5}}
+{{ if (rv$crew_count >= 1) input$crew_name1 }} | {{ if (rv$crew_count >= 1) input$crew_role1 }} | {{ if (rv$crew_count >= 1) input$crew_contact1 }}
+{{ if (rv$crew_count >= 2) input$crew_name2 }} | {{ if (rv$crew_count >= 2) input$crew_role2 }} | {{ if (rv$crew_count >= 2) input$crew_contact2 }}
+{{ if (rv$crew_count >= 3) input$crew_name3 }} | {{ if (rv$crew_count >= 3) input$crew_role3 }} | {{ if (rv$crew_count >= 3) input$crew_contact3 }}
+{{ if (rv$crew_count >= 4) input$crew_name4 }} | {{ if (rv$crew_count >= 4) input$crew_role4 }} | {{ if (rv$crew_count >= 4) input$crew_contact4 }}
+{{ if (rv$crew_count >= 5) input$crew_name5 }} | {{ if (rv$crew_count >= 5) input$crew_role5 }} | {{ if (rv$crew_count >= 5) input$crew_contact5 }}
 
-### Swim History
+### Swim Experience
 
 Year | Swim | Distance | Duration | Temp
 ---- | ---- | -------- | -------- | ----
-{{input$swim_year1}} | {{input$swim_name1}} | {{input$swim_dist1}} {{input$swim_units1}} | {{input$swim_dur1}} | {{input$swim_temp1}}
-{{input$swim_year2}} | {{input$swim_name2}} | {{input$swim_dist2}} {{input$swim_units2}} | {{input$swim_dur2}} | {{input$swim_temp2}}
-{{input$swim_year3}} | {{input$swim_name3}} | {{input$swim_dist3}} {{input$swim_units3}} | {{input$swim_dur3}} | {{input$swim_temp3}}
-{{input$swim_year4}} | {{input$swim_name4}} | {{input$swim_dist4}} {{input$swim_units4}} | {{input$swim_dur4}} | {{input$swim_temp4}}
-{{input$swim_year5}} | {{input$swim_name5}} | {{input$swim_dist5}} {{input$swim_units5}} | {{input$swim_dur5}} | {{input$swim_temp5}}
+{{ if (rv$swim_count >= 1) input$swim_year1 }} | {{ if (rv$swim_count >= 1) input$swim_name1 }} | {{ if (rv$swim_count >= 1) input$swim_dist1 }} {{ if (rv$swim_count >= 1) input$swim_units1 }} | {{ if (rv$swim_count >= 1) paste0(input$swim_hr1, "hr") }} {{ if (rv$swim_count >= 1) paste0(input$swim_min1, "min") }}  | {{ if (rv$swim_count >= 1) input$swim_temp1 }}
+{{ if (rv$swim_count >= 2) input$swim_year2 }} | {{ if (rv$swim_count >= 2) input$swim_name2 }} | {{ if (rv$swim_count >= 2) input$swim_dist2 }} {{ if (rv$swim_count >= 1) input$swim_units2 }} | {{ if (rv$swim_count >= 2) paste0(input$swim_hr2, "hr") }} {{ if (rv$swim_count >= 2) paste0(input$swim_min2, "min") }}  | {{ if (rv$swim_count >= 2) input$swim_temp2 }}
+{{ if (rv$swim_count >= 3) input$swim_year3 }} | {{ if (rv$swim_count >= 3) input$swim_name3 }} | {{ if (rv$swim_count >= 3) input$swim_dist3 }} {{ if (rv$swim_count >= 1) input$swim_units3 }} | {{ if (rv$swim_count >= 3) paste0(input$swim_hr3, "hr") }} {{ if (rv$swim_count >= 3) paste0(input$swim_min3, "min") }}  | {{ if (rv$swim_count >= 3) input$swim_temp3 }}
+{{ if (rv$swim_count >= 4) input$swim_year4 }} | {{ if (rv$swim_count >= 4) input$swim_name4 }} | {{ if (rv$swim_count >= 4) input$swim_dist4 }} {{ if (rv$swim_count >= 1) input$swim_units4 }} | {{ if (rv$swim_count >= 4) paste0(input$swim_hr4, "hr") }} {{ if (rv$swim_count >= 4) paste0(input$swim_min4, "min") }}  | {{ if (rv$swim_count >= 4) input$swim_temp4 }}
+{{ if (rv$swim_count >= 5) input$swim_year5 }} | {{ if (rv$swim_count >= 5) input$swim_name5 }} | {{ if (rv$swim_count >= 5) input$swim_dist5 }} {{ if (rv$swim_count >= 1) input$swim_units5 }} | {{ if (rv$swim_count >= 5) paste0(input$swim_hr5, "hr") }} {{ if (rv$swim_count >= 5) paste0(input$swim_min5, "min") }}  | {{ if (rv$swim_count >= 5) input$swim_temp5 }}
 
 #### More Details
 
