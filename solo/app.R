@@ -5,6 +5,7 @@ library(lubridate)
 library(rmarkdown)
 library(magrittr)
 library(markdown)
+library(gmailr)
 
 source("fill_sample.R")
 countries <- readLines("../_includes/countries.txt")
@@ -15,6 +16,7 @@ reqd <- function(input) div(class = 'required', input)
 dev_mode <- function() if (grepl("dev", getwd())) 1 else 0
 DIR <- if (dev_mode()) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
 DATADIR <- file.path(DIR, "data")
+emails <- readLines("../conf/emails.txt")
 
 server <- function(input, output, session) {
 
@@ -300,7 +302,17 @@ server <- function(input, output, session) {
     shinyjs::show("submit_msg")
     shinyjs::hide("error")
     tryCatch({
+      # convert html to pdf
       system(paste("wkhtmltopdf", rv$file_html, rv$file_pdf))
+      # email notification
+      options("gmailr.httr_oath_cache" = 'gm_auth')
+      gmail_auth()
+      mime("Reply-To" = input$s_email) %>%
+        to(emails) %>% 
+        from(emails) %>%
+        subject(paste0("SBCSA sanction application for ", input$s_name)) %>%
+        attach_file(rv$file_pdf) %>%
+        send_message
     },
     error = function(err) {
       shinyjs::html("error_msg", err$message)
