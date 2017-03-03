@@ -1,4 +1,4 @@
-td { padding: 10px;}
+td, th { padding: 10px;}
 th { border-bottom: 1px solid black; text-align: center; }
 h1 { line-height: .8em; font-family: Georgia; }
 h2 { line-height: .9em; font-family: Georgia; }

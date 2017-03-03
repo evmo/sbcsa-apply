@@ -127,7 +127,8 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$remove_swim, {
-    removeUI(selector = paste0('#swim', rv$swim_count))
+    n <- rv$swim_count
+    removeUI(selector = paste0("#swim", n))
     if (rv$swim_count > 0) rv$swim_count <<- rv$swim_count - 1
   })
   
@@ -461,12 +462,12 @@ ui <- function(request) {
         h2("Swim Experience"),
         p("Please list up to five documented marathon swims you have completed, especially swims from the past 1-3 years."),
         actionButton("add_swim", "Add Documented Swim"),
-        hidden(actionButton("remove_swim", "Delete Swim")),
+        hidden(actionButton("remove_swim", "Delete Most Recent")),
         div(id = "doc_swims"),
         hr(),
         p("You may wish to provide additional information about your 
           swimming background and training -- especially if your documented 
-          marathon swimming history is somewhat sparse."),
+          marathon swimming experience is somewhat sparse."),
         p("Provide more details on swimming background?"),
         checkboxInput("more_background", "Yes"),
         hidden(div(id = "more_details",
@@ -524,17 +525,17 @@ ui <- function(request) {
         h2("Liability Waiver"),
         h5(waiver[1]), hr(),
         p(waiver[2]), 
-        p(waiver[3]), reqd(textInput("initial1", "Initials", width = 50)),
-        p(waiver[4]), reqd(textInput("initial2", "Initials", width = 50)),
-        p(waiver[5]), reqd(textInput("initial3", "Initials", width = 50)),
-        p(waiver[6]), reqd(textInput("initial4", "Initials", width = 50)),
-        p(waiver[7]), reqd(textInput("initial5", "Initials", width = 50)),
-        p(waiver[8]), reqd(textInput("initial6", "Initials", width = 50)),
-        p(waiver[9]), reqd(textInput("initial7", "Initials", width = 50)),
-        p(waiver[10]), reqd(textInput("initial8", "Initials", width = 50)),
-        p(waiver[11]), reqd(textInput("initial9", "Initials", width = 50)),
-        p(waiver[12]), reqd(textInput("initial10", "Initials", width = 50)),
-        p(waiver[13]), reqd(textInput("initial11", "Initials", width = 50)),
+        p(waiver[3]), reqd(textInput("initial1", "Initials", width = 70)),
+        p(waiver[4]), reqd(textInput("initial2", "Initials", width = 70)),
+        p(waiver[5]), reqd(textInput("initial3", "Initials", width = 70)),
+        p(waiver[6]), reqd(textInput("initial4", "Initials", width = 70)),
+        p(waiver[7]), reqd(textInput("initial5", "Initials", width = 70)),
+        p(waiver[8]), reqd(textInput("initial6", "Initials", width = 70)),
+        p(waiver[9]), reqd(textInput("initial7", "Initials", width = 70)),
+        p(waiver[10]), reqd(textInput("initial8", "Initials", width = 70)),
+        p(waiver[11]), reqd(textInput("initial9", "Initials", width = 70)),
+        p(waiver[12]), reqd(textInput("initial10", "Initials", width = 70)),
+        p(waiver[13]), reqd(textInput("initial11", "Initials", width = 70)),
         uiOutput("waiver_agree"),
         reqd(textInput("waiver_sig", 
                        "Electronic Signature",
