@@ -352,7 +352,7 @@ ui <- function(request) {
       includeScript("../GA.js")
     ),
     
-    navlistPanel("Solo Application", id = "navlist",
+    navlistPanel("Solo Application", id = "navlist", widths = c(3, 9),
         
       # -------- INSTRUCTIONS -------------
 
