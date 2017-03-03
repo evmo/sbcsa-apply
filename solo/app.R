@@ -23,9 +23,16 @@ server <- function(input, output, session) {
   rv <- reactiveValues(v = 0)
 
   shinyjs::addClass(class = "disabled-link", 
-                    selector = ".nav li:nth-child(10) a,
-                                .nav li:nth-child(11) a")
-  shinyjs::addClass(class = "red", selector = ".nav li:nth-child(12) a")
+                    selector = ".nav li:nth-child(4) a,
+                                .nav li:nth-child(5) a,
+                                .nav li:nth-child(6) a,
+                                .nav li:nth-child(7) a,
+                                .nav li:nth-child(8) a,
+                                .nav li:nth-child(9) a,
+                                .nav li:nth-child(10) a,
+                                .nav li:nth-child(11) a,
+                                .nav li:nth-child(12) a,
+                                .nav li:nth-child(13) a")
   
   observe({  # observers for displaying hidden inputs
 
@@ -75,6 +82,91 @@ server <- function(input, output, session) {
       shinyjs::show("new_lifetime") 
     else 
       shinyjs::hide("new_lifetime")
+  })
+
+  output$dobD_ui <- renderUI({
+    if (input$dobM %in% c(4, 6, 9, 11))
+      d <- 30
+    else if (input$dobM == 2)
+      d <- 29
+    else
+      d <- 31
+    
+    reqd(selectInput("dobD", "Day", 
+                     choices = c("[SELECT]", seq(1, d)), 
+                     selectize = F))
+  })
+
+  output$splashD_ui <- renderUI({
+    if (input$splashM %in% c(4, 6, 9, 11))
+      d <- 30
+    else if (input$splashM == 2)
+      d <- 29
+    else
+      d <- 31
+    
+    reqd(selectInput("splashD", "Day", 
+                     choices = c("[SELECT]", seq(1, d)), 
+                     selectize = F))
+  })
+  
+  dates_filled <- reactive({
+    input$dobY != "[SELECT]" && 
+    input$dobM != "[SELECT]" &&
+    input$dobD != "[SELECT]" &&
+    input$splashM != "[SELECT]" &&
+    input$splashD != "[SELECT]"
+  })
+  
+  observe({
+    if (dates_filled()) {
+      rv$dob <- ISOdate(as.integer(input$dobY),
+                        which(month.name == input$dobM),
+                        input$dobD)
+      rv$splash <- ISOdate(as.integer(input$splashY),
+                           which(month.name == input$splashM),
+                           input$splashD)
+      rv$swim_age <- as.period(interval(start = rv$dob, end = rv$splash))$year
+      
+      if (rv$swim_age < 18) {
+        shinyjs::show("under18")
+        updateTextInput(session, "s_email", label = "Parent's Email Address")
+        updateTextInput(session, "s_phone", label = "Parent's Phone")
+        updateTextAreaInput(session, "s_mailing", label = "Parent's Mailing Address")
+      }
+    }
+  })
+
+  observe({      # not quite ready
+    if (dates_filled()) {
+      if (rv$swim_age >= 18 || (rv$swim_age < 18 && input$parent_present)) {
+        shinyjs::removeClass(class = "disabled-link",
+          selector = ".nav li:nth-child(4) a,
+                      .nav li:nth-child(5) a,
+                      .nav li:nth-child(6) a,
+                      .nav li:nth-child(7) a,
+                      .nav li:nth-child(8) a,
+                      .nav li:nth-child(9) a,
+                      .nav li:nth-child(10) a,
+                      .nav li:nth-child(11) a,
+                      .nav li:nth-child(12) a,
+                      .nav li:nth-child(13) a")
+        shinyjs::addClass(class = "red", selector = ".nav li:nth-child(13) a")
+      } else {
+        shinyjs::addClass(class = "disabled-link",
+          selector = ".nav li:nth-child(4) a,
+                      .nav li:nth-child(5) a,
+                      .nav li:nth-child(6) a,
+                      .nav li:nth-child(7) a,
+                      .nav li:nth-child(8) a,
+                      .nav li:nth-child(9) a,
+                      .nav li:nth-child(10) a,
+                      .nav li:nth-child(11) a,
+                      .nav li:nth-child(12) a,
+                      .nav li:nth-child(13) a")
+        shinyjs::removeClass(class = "red", selector = ".nav li:nth-child(13) a")
+      }
+    }
   })
   
   observeEvent(input$fill_sample, {
@@ -190,7 +282,7 @@ server <- function(input, output, session) {
         (!is.null(input$swim_name1) && 
             input$swim_name1 != "" &&
             input$swim_dist1 != ""),
-        "Need swim background"
+        "Please enter at least one documented swim, or provide additional details."
       ),
       need(input$feed_plan != "", 
            "Please enter a feed plan"),
@@ -301,7 +393,7 @@ server <- function(input, output, session) {
     shinyjs::disable("submit_app")
     shinyjs::show("submit_msg")
     shinyjs::hide("error")
-    tryCatch({
+    tryCatch({07
       # convert html to pdf
       system(paste("wkhtmltopdf", rv$file_html, rv$file_pdf))
       # email notification
@@ -360,6 +452,55 @@ ui <- function(request) {
         includeMarkdown("../_includes/instructions.md")
       ),
 
+      # ------------- IMPORTANT DATES --------------
+
+      tabPanel("Important Dates",
+        h2("Important Dates"),
+        
+        h4("What is the swimmer's date of birth?"),
+        fluidRow(
+          column(4,
+             reqd(selectInput("dobY", "Year", 
+                              choices = c("[SELECT]", seq(year(Sys.Date()) - 13, 
+                                            year(Sys.Date()) - 100)),
+                              selectize = F))
+          ),
+          column(4,
+             reqd(selectInput("dobM", "Month", 
+                              choices = c("[SELECT]", month.name), 
+                              selectize = F))
+          ),
+          column(4,
+            uiOutput("dobD_ui")
+          )
+        ),
+        
+        h4("When is the swim scheduled to begin?"),
+        fluidRow(
+          column(4,
+             reqd(selectInput("splashY", "Year", 
+                              choices = seq(year(Sys.Date()), 
+                                            year(Sys.Date()) + 1),
+                              selectize = F))
+          ),
+          column(4,
+             reqd(selectInput("splashM", "Month", 
+                              choices = c("[SELECT]", month.name), 
+                              selectize = F))
+          ),
+          column(4,
+            uiOutput("splashD_ui")
+          )
+        ),
+
+        hidden(div(id = "under18",
+          h4("Swimmer will be younger than 18 on the date of the swim.
+              Is there a parent or guardian present to help complete 
+              the rest of the application?"),
+          checkboxInput("parent_present", "Yes")
+        ))
+      ),
+
       # -------- THE SWIMMER -------------
       
       tabPanel("The Swimmer",
@@ -367,9 +508,7 @@ ui <- function(request) {
         hidden(actionButton("fill_sample", "Fill in sample data")),
         reqd(textInput("s_name", "Full Name")),
         fluidRow(
-          column(6, reqd(dateInput("s_dob", "Date of Birth", startview = "year",
-                          min = Sys.Date() - years(100), max = Sys.Date() - 365,
-                          value = Sys.Date() - years(40)))),
+          column(6, uiOutput("dob_disp")),
           column(6, reqd(selectInput("s_gender", 
                                      "Gender",
                                      choices = c("[SELECT]", "female", "male"),
@@ -377,7 +516,7 @@ ui <- function(request) {
         ),
         fluidRow(
           column(6, reqd(textInput("s_email", "Email Address"))),
-          column(6, textInput("s_phone", "Mobile Phone"))
+          column(6, textInput("s_phone", "Phone"))
         ),
         reqd(textAreaInput("s_mailing", "Mailing Address", width = 400, height = 125)),
         fluidRow(
@@ -437,7 +576,6 @@ ui <- function(request) {
           column(4, selectInput("harbor_time", "Hour", seq(0, 23)))
         ),
         fluidRow(
-          column(8, dateInput("splash_date", "Swimmer in the Water")),
           column(4, selectInput("splash_time", "Hour", seq(0, 23)))
         ),
         
