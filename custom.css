@@ -9,12 +9,16 @@
 
 .big { font-size: 1000%; }
 
-.required input { border: 1px dashed red; }
-.required textArea { border: 1px dashed red; }
-.required select { border: 1px dashed red; }
+.required input, .required textArea, .required select, span.required {
+	border: 1px dashed red; 
+}
+
+span.required { 
+	padding: 3px;
+}
 
 #valid_page1, #valid_page2, #valid_page3, #valid_page4, 
-#valid_page5, #valid_page6, #valid_page7 { 
+#valid_page5, #valid_page6, #valid_page7, #valid_page0 { 
   color: red; 
   margin-top: 10px;
 }
@@ -29,3 +33,5 @@ li.navbar-brand { margin-top: 110px; }
 
 .tab-content li { margin-bottom: 10px; }
 .tab-content h2 { border-bottom: 1px solid gray; }
+
+h5 { font-weight: bold; }

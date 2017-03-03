@@ -1,4 +1,7 @@
 fill_sample <- function(session) {
+  updateSelectInput(session, 'dobY', selected = '1970')
+  updateSelectInput(session, 'dobM', selected = 'December')
+  updateSelectInput(session, 'splashM', selected = 'August')
   updateTextInput(session, 's_name', value = 'Matthew Webb')
   updateTextInput(session, 's_email', value = 'mwebb@channelswimmingassocation.com')
   updateSelectInput(session, 's_gender', selected = 'male')

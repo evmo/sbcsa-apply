@@ -23,68 +23,41 @@ server <- function(input, output, session) {
   rv <- reactiveValues(v = 0)
 
   shinyjs::addClass(class = "disabled-link", 
-                    selector = ".nav li:nth-child(4) a,
-                                .nav li:nth-child(5) a,
-                                .nav li:nth-child(6) a,
-                                .nav li:nth-child(7) a,
-                                .nav li:nth-child(8) a,
-                                .nav li:nth-child(9) a,
-                                .nav li:nth-child(10) a,
-                                .nav li:nth-child(11) a,
-                                .nav li:nth-child(12) a,
-                                .nav li:nth-child(13) a")
+    selector = ".nav li:nth-child(10) a, .nav li:nth-child(11) a")
   
   observe({  # observers for displaying hidden inputs
-
     if (dev_mode()) shinyjs::show("fill_sample")
 
-    if (input$other_citizen == T) 
-      shinyjs::show("s_citizenship") 
-    else 
-      shinyjs::hide("s_citizenship")
+    if (input$other_citizen == T) shinyjs::show("s_citizenship") 
+    else                           shinyjs::hide("s_citizenship")
 
-    if (input$route == "some other route") 
-      shinyjs::show("route_other")
-    else 
-      shinyjs::hide("route_other")
+    if (input$route == "some other route") shinyjs::show("route_other")
+    else                                   shinyjs::hide("route_other")
 
-    if (input$boat == "BOAT NOT LISTED")
-      shinyjs::show("boat_pilot_other")
-    else
-      shinyjs::hide("boat_pilot_other")
+    if (input$boat == "BOAT NOT LISTED") shinyjs::show("boat_pilot_other")
+    else                                 shinyjs::hide("boat_pilot_other")
 
-    if (input$boat == "TO BE DETERMINED")
-      shinyjs::show("boat_notify")
-    else
-      shinyjs::hide("boat_notify")
+    if (input$boat == "TO BE DETERMINED") shinyjs::show("boat_notify")
+    else                                  shinyjs::hide("boat_notify")
 
-    if (rv$crew_count > 0)
-      shinyjs::show("remove_crew")
-    else
-      shinyjs::hide("remove_crew")
+    if (rv$crew_count > 0) shinyjs::show("remove_crew")
+    else                   shinyjs::hide("remove_crew")
 
-    if (rv$swim_count > 0)
-      shinyjs::show("remove_swim")
-    else
-      shinyjs::hide("remove_swim")
+    if (rv$swim_count > 0) shinyjs::show("remove_swim")
+    else                   shinyjs::hide("remove_swim")
 
-    if (rv$swim_count >= 5)
-      shinyjs::hide("add_swim")
-    else
-      shinyjs::show("add_swim")
+    if (rv$swim_count >= 5) shinyjs::hide("add_swim")
+    else                    shinyjs::show("add_swim")
 
-    if (input$more_background == T) 
-      shinyjs::show("more_details") 
-    else 
-      shinyjs::hide("more_details")
+    if (input$more_background == T) shinyjs::show("more_details") 
+    else                            shinyjs::hide("more_details")
 
-    if (input$current_lifetime == "No") 
-      shinyjs::show("new_lifetime") 
-    else 
-      shinyjs::hide("new_lifetime")
+    if (input$current_lifetime == "No") shinyjs::show("new_lifetime") 
+    else                                shinyjs::hide("new_lifetime")
   })
 
   output$dobD_ui <- renderUI({
+    req(input$dobM)
     if (input$dobM %in% c(4, 6, 9, 11))
       d <- 30
     else if (input$dobM == 2)
@@ -98,6 +71,7 @@ server <- function(input, output, session) {
   })
 
   output$splashD_ui <- renderUI({
+    req(input$splashM)
     if (input$splashM %in% c(4, 6, 9, 11))
       d <- 30
     else if (input$splashM == 2)
@@ -109,6 +83,11 @@ server <- function(input, output, session) {
                      choices = c("[SELECT]", seq(1, d)), 
                      selectize = F))
   })
+
+  output$splash_date_disp <- renderUI({
+    req(rv$splash)
+    p(rv$splash)
+  })
   
   dates_filled <- reactive({
     input$dobY != "[SELECT]" && 
@@ -119,64 +98,31 @@ server <- function(input, output, session) {
   })
   
   observe({
-    if (dates_filled()) {
-      rv$dob <- ISOdate(as.integer(input$dobY),
-                        which(month.name == input$dobM),
-                        input$dobD)
-      rv$splash <- ISOdate(as.integer(input$splashY),
-                           which(month.name == input$splashM),
-                           input$splashD)
-      rv$swim_age <- as.period(interval(start = rv$dob, end = rv$splash))$year
-      
-      if (rv$swim_age < 18) {
-        shinyjs::show("under18")
-        updateTextInput(session, "s_email", label = "Parent's Email Address")
-        updateTextInput(session, "s_phone", label = "Parent's Phone")
-        updateTextAreaInput(session, "s_mailing", label = "Parent's Mailing Address")
-      }
-    }
-  })
-
-  observe({      # not quite ready
-    if (dates_filled()) {
-      if (rv$swim_age >= 18 || (rv$swim_age < 18 && input$parent_present)) {
-        shinyjs::removeClass(class = "disabled-link",
-          selector = ".nav li:nth-child(4) a,
-                      .nav li:nth-child(5) a,
-                      .nav li:nth-child(6) a,
-                      .nav li:nth-child(7) a,
-                      .nav li:nth-child(8) a,
-                      .nav li:nth-child(9) a,
-                      .nav li:nth-child(10) a,
-                      .nav li:nth-child(11) a,
-                      .nav li:nth-child(12) a,
-                      .nav li:nth-child(13) a")
-        shinyjs::addClass(class = "red", selector = ".nav li:nth-child(13) a")
-      } else {
-        shinyjs::addClass(class = "disabled-link",
-          selector = ".nav li:nth-child(4) a,
-                      .nav li:nth-child(5) a,
-                      .nav li:nth-child(6) a,
-                      .nav li:nth-child(7) a,
-                      .nav li:nth-child(8) a,
-                      .nav li:nth-child(9) a,
-                      .nav li:nth-child(10) a,
-                      .nav li:nth-child(11) a,
-                      .nav li:nth-child(12) a,
-                      .nav li:nth-child(13) a")
-        shinyjs::removeClass(class = "red", selector = ".nav li:nth-child(13) a")
-      }
+    req(dates_filled())
+    rv$dob <- as.Date(ISOdate(as.integer(input$dobY),
+                      which(month.name == input$dobM),
+                      input$dobD))
+    rv$splash <- as.Date(ISOdate(as.integer(input$splashY),
+                         which(month.name == input$splashM),
+                         input$splashD))
+    rv$swim_age <- as.period(interval(start = rv$dob, end = rv$splash))$year
+    
+    if (rv$swim_age < 18 && rv$swim_age >= 14) {
+      shinyjs::show("under18")
+      shinyjs::hide("swimmer_contact")
+      shinyjs::show("parent_contact")
+      shinyjs::show("waiver_parent")
+    } else {
+      shinyjs::hide("under18")
+      shinyjs::show("swimmer_contact")
+      shinyjs::hide("parent_contact")
+      shinyjs::hide("waiver_parent")
     }
   })
   
   observeEvent(input$fill_sample, {
     if (dev_mode())
       fill_sample(session)
-  })
-  
-  # when harbor departure entered, update splash date to match
-  observeEvent(input$harbor_date, {
-    updateDateInput(session, "splash_date", value = input$harbor_date)
   })
   
   # insertUI for crew members
@@ -226,27 +172,41 @@ server <- function(input, output, session) {
     if (rv$swim_count > 0) rv$swim_count <<- rv$swim_count - 1
   })
   
-  output$waiver_agree <- renderUI({
-    statement <- paste0("I, ", input$s_name, tolower(
-        ", HAVE READ THIS WAIVER AND RELEASE OF LIABILITY, 
-         FULLY UNDERSTAND ITS TERMS, UNDERSTAND THAT I HAVE GIVEN UP 
-         SUBSTANTIAL RIGHTS BY SIGNING IT, AND HAVE SIGNED IT FREELY 
-         AND VOLUNTARILY WITHOUT ANY INDUCEMENT. "),
-      "I understand that typing my name represents a legal signature.")
-    checkboxInput("waiver_box", statement, width = "100%")
-  })
-  
   # Page Validations ---------------------------------
+
+  validation0 <- function() {
+    validate(
+      need(input$dobY != "[SELECT]" &&
+           input$dobM != "[SELECT]" &&
+           input$dobD != "[SELECT]",
+           "Please enter the swimmer's date of birth."
+      ),
+      need(input$splashM != "[SELECT]" &&
+           input$splashD != "[SELECT]",
+           "Please enter the scheduled date of the swim attempt."
+      ),
+      need(!dates_filled() || rv$swim_age >= 14, 
+           "The swimmer must be at least 14 years old on the date of the swim."
+      ),
+      need(!dates_filled() || 
+           rv$swim_age < 14 || 
+           rv$swim_age >= 18 || 
+           input$parent_present,
+        "Parent or guardian must be present for the rest of the application."
+      )
+    )
+  }
   
+  output$valid_page0 <- renderUI(validation0())
+
   validation1 <- function() {
     validate(
       need(input$s_name != "", 
            "Please enter your name"),
-      need(input$s_dob < Sys.Date() - 18 * 365, 
-           "Swimmer must be at least 14 years old"),
-      need(grepl(".+@.+\\..+", input$s_email), 
+      need(grepl(".+@.+\\..+", input$s_email) || grepl(".+@.+\\..+", input$p_email), 
            "Please enter a valid email address"),
-      need(input$s_mailing != "", "Please enter a mailing address"),
+      need(input$s_mailing != "" || input$p_mailing != "", 
+           "Please enter a mailing address"),
       need(input$s_country != "[SELECT]", "Please select a country"),
       need(input$other_citizen == F | input$s_citizenship != "[SELECT]",
             "Please select a country of citizenship"),
@@ -323,7 +283,7 @@ server <- function(input, output, session) {
       need(input$initial9 != "", "Please initial item #9"),
       need(input$initial10 != "", "Please initial item #10"),
       need(input$initial11 != "", "Please initial item #11"),
-      # need(input$waiver_box,      "Please check the box"),
+      need(input$waiver_box,      "Please check the box"),
       need(input$waiver_sig != "", "Signature is required")
     )
   }
@@ -344,7 +304,25 @@ server <- function(input, output, session) {
   output$valid_page7 <- renderUI(validation7())
 
   observe({
-    if (all(is.null( validation1() ), 
+    if (is.null(validation0())) 
+      addClass(class = "green", selector = ".nav li:nth-child(2) a")  # Start Here
+    if (is.null(validation1())) 
+      addClass(class = "green", selector = ".nav li:nth-child(3) a")  # Swimmer
+    if (is.null(validation2())) 
+      addClass(class = "green", selector = ".nav li:nth-child(4) a")  # Swim
+    if (is.null(validation3())) 
+      addClass(class = "green", selector = ".nav li:nth-child(5) a")  # Support Team
+    if (is.null(validation4()))
+      addClass(class = "green", selector = ".nav li:nth-child(6) a")  # Experience
+    if (is.null(validation5())) 
+      addClass(class = "green", selector = ".nav li:nth-child(7) a")  # Medical
+    if (is.null(validation6())) 
+      addClass(class = "green", selector = ".nav li:nth-child(8) a")  # Waiver
+    if (is.null(validation7())) 
+      addClass(class = "green", selector = ".nav li:nth-child(9) a")  # Sanction Fees
+
+    if (all(is.null( validation0() ),  # if all validations pass...
+            is.null( validation1() ), 
             is.null( validation2() ),
             is.null( validation3() ),
             is.null( validation4() ),
@@ -352,7 +330,7 @@ server <- function(input, output, session) {
             is.null( validation6() ),
             is.null( validation7() ) 
       )) {
-      shinyjs::removeClass(
+      shinyjs::removeClass(            # enable preview
         class = "disabled-link", 
         selector = ".nav li:nth-child(10) a"
       )}
@@ -375,7 +353,6 @@ server <- function(input, output, session) {
                    stylesheet = "../output.css")
     rv$v <- rv$v + 1
     shinyjs::show("preview")
-    shinyjs::show("draw_sig")
     shinyjs::show("submit_button")
     shinyjs::removeClass(
         class = "disabled-link", 
@@ -446,17 +423,11 @@ ui <- function(request) {
     
     navlistPanel("Solo Application", id = "navlist", widths = c(3, 9),
         
-      # -------- INSTRUCTIONS -------------
+      # -------- START HERE -------------
 
-      tabPanel("Instructions",
-        includeMarkdown("../_includes/instructions.md")
-      ),
-
-      # ------------- IMPORTANT DATES --------------
-
-      tabPanel("Important Dates",
-        h2("Important Dates"),
-        
+      tabPanel("Start Here",
+        includeMarkdown("../_includes/start_here.md"),
+        h3("Complete these questions first:"),
         h4("What is the swimmer's date of birth?"),
         fluidRow(
           column(4,
@@ -474,7 +445,7 @@ ui <- function(request) {
             uiOutput("dobD_ui")
           )
         ),
-        
+          
         h4("When is the swim scheduled to begin?"),
         fluidRow(
           column(4,
@@ -498,27 +469,29 @@ ui <- function(request) {
               Is there a parent or guardian present to help complete 
               the rest of the application?"),
           checkboxInput("parent_present", "Yes")
-        ))
+        )),
+        hidden(actionButton("fill_sample", "Fill in sample data")),
+        uiOutput("valid_page0")
       ),
-
+      
       # -------- THE SWIMMER -------------
       
       tabPanel("The Swimmer",
         h2("The Swimmer"),
-        hidden(actionButton("fill_sample", "Fill in sample data")),
-        reqd(textInput("s_name", "Full Name")),
         fluidRow(
-          column(6, uiOutput("dob_disp")),
+          column(6, reqd(textInput("s_name", "Full Name"))),
           column(6, reqd(selectInput("s_gender", 
                                      "Gender",
                                      choices = c("[SELECT]", "female", "male"),
                                      selectize = F)))
         ),
-        fluidRow(
-          column(6, reqd(textInput("s_email", "Email Address"))),
-          column(6, textInput("s_phone", "Phone"))
+        div(id = "swimmer_contact",
+          fluidRow(
+            column(6, reqd(textInput("s_email", "Email Address"))),
+            column(6, textInput("s_phone", "Phone"))
+          ),
+          reqd(textAreaInput("s_mailing", "Mailing Address", width = 400, height = 125))
         ),
-        reqd(textAreaInput("s_mailing", "Mailing Address", width = 400, height = 125)),
         fluidRow(
           column(6, 
             reqd(selectInput("s_country", 
@@ -535,6 +508,17 @@ ui <- function(request) {
         hidden(
           selectInput("s_citizenship", "Citizenship", choices = countries)
         ),
+
+        hidden(div(id = "parent_contact",
+          h4("Parent/Guardian Contact Info"),
+          reqd(textInput("p_name", "Parent - Full Name")),
+          fluidRow(
+            column(6, reqd(textInput("p_email", "Email Address"))),
+            column(6, textInput("p_phone", "Phone"))
+          ),
+          reqd(textAreaInput("p_mailing", "Mailing Address", width = 400, height = 125))
+        )),
+
         h3("Emergency Contact Person"),
         p("Please list an emergency contact person who will 
             be on land during the swim."),
@@ -572,11 +556,12 @@ ui <- function(request) {
         
         h4("When is your swim scheduled?"),
         fluidRow(
-          column(8, dateInput("harbor_date", "Boat Departs Harbor")),
-          column(4, selectInput("harbor_time", "Hour", seq(0, 23)))
+          column(6, dateInput("harbor_date", "Boat Departs Harbor")),
+          column(6, selectInput("harbor_time", "Hour", seq(0, 23)))
         ),
         fluidRow(
-          column(4, selectInput("splash_time", "Hour", seq(0, 23)))
+          column(6, h5("Splash Date"), uiOutput("splash_date_disp")),
+          column(6, selectInput("splash_time", "Hour", seq(0, 23)))
         ),
         
         h4("Permission to publicize?"),
@@ -606,7 +591,7 @@ ui <- function(request) {
         uiOutput("valid_page3")
       ),
       
-      # -------- MARATHON SWIMMING BACKGROUND --------
+      # -------- MARATHON SWIMMING EXPERIENCE --------
       
       tabPanel("Swim Experience",
         h2("Swim Experience"),
@@ -673,20 +658,25 @@ ui <- function(request) {
       
       tabPanel("Liability Waiver",
         h2("Liability Waiver"),
-        h5(waiver[1]), hr(),
-        p(waiver[2]), 
-        p(waiver[3]), reqd(textInput("initial1", "Initials", width = 70)),
-        p(waiver[4]), reqd(textInput("initial2", "Initials", width = 70)),
-        p(waiver[5]), reqd(textInput("initial3", "Initials", width = 70)),
-        p(waiver[6]), reqd(textInput("initial4", "Initials", width = 70)),
-        p(waiver[7]), reqd(textInput("initial5", "Initials", width = 70)),
-        p(waiver[8]), reqd(textInput("initial6", "Initials", width = 70)),
-        p(waiver[9]), reqd(textInput("initial7", "Initials", width = 70)),
-        p(waiver[10]), reqd(textInput("initial8", "Initials", width = 70)),
-        p(waiver[11]), reqd(textInput("initial9", "Initials", width = 70)),
-        p(waiver[12]), reqd(textInput("initial10", "Initials", width = 70)),
-        p(waiver[13]), reqd(textInput("initial11", "Initials", width = 70)),
-        uiOutput("waiver_agree"),
+        hidden(div(id = "waiver_parent", 
+          h4("The parent or guardian of the swimmer should read this form,
+            initial each section, and enter an electronic signature at the bottom.")
+        )),
+        h5(waiver[1]), 
+        hr(),
+        p(waiver[2]),
+        
+        lapply(3:13, function(i) { list(
+          p(waiver[i]),
+          reqd(textInput(paste0("initial", i-2), "Initials", width = 70))
+        )}),
+
+        checkboxInput("waiver_box", 
+          label = "I have read this waiver and release of liability, fully understand its terms, 
+          understand that I have given up substantial rights by signing it, 
+          and have signed it freely and voluntarily without any inducement.",
+          width = "100%"
+        ),
         reqd(textInput("waiver_sig", 
                        "Electronic Signature",
                        placeholder = "Please type your full name")),
