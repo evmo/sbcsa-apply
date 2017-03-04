@@ -562,7 +562,7 @@ ui <- function(request) {
             Indicate each crew member's specific role (kayaker,
             feeder, support swimmer, etc.)"),
         actionButton("add_crew", "Add Crew Member"),
-        hidden(actionButton("remove_crew", "Delete Crew Member")),
+        hidden(actionButton("remove_crew", "Delete Last")),
         div(id = "crew"),
         uiOutput("valid_page3")
       ),
