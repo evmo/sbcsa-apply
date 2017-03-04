@@ -61,17 +61,17 @@ server <- function(input, output, session) {
 
   output$dobD_ui <- renderUI({
     req(input$dobM)
-    d <- ifelse(input$dobM=="[SELECT]", 31, days_in_month(input$dobM))
+    days <- ifelse(input$dobM=="[SELECT]", 31, days_in_month(input$dobM))
     reqd(selectInput("dobD", "Day", 
-                     choices = c("[SELECT]", seq(1, d)), 
+                     choices = c("[SELECT]", seq(1, days)), 
                      selectize = F))
   })
 
   output$splashD_ui <- renderUI({
     req(input$splashM)
-    d <- ifelse(input$splashM=="[SELECT]", 31, days_in_month(input$splashM))
+    days <- ifelse(input$splashM=="[SELECT]", 31, days_in_month(input$splashM))
     reqd(selectInput("splashD", "Day", 
-                     choices = c("[SELECT]", seq(1, d)), 
+                     choices = c("[SELECT]", seq(1, days)), 
                      selectize = F))
   })
 
@@ -384,16 +384,9 @@ server <- function(input, output, session) {
       shinyjs::show("download_next_steps")
       shinyjs::addClass(
         class = "disabled-link", 
-        selector = ".nav li:nth-child(2) a,
-                    .nav li:nth-child(3) a,
-                    .nav li:nth-child(4) a,
-                    .nav li:nth-child(5) a,
-                    .nav li:nth-child(6) a,
-                    .nav li:nth-child(7) a,
-                    .nav li:nth-child(8) a,
-                    .nav li:nth-child(9) a,
-                    .nav li:nth-child(10) a,
-                    .nav li:nth-child(12) a"
+        selector = paste(
+                    paste(".nav li:nth-child(", c(3:10, 12), ")", sep = ""), 
+                    collapse = ",")
       )
     })
   })
@@ -588,7 +581,7 @@ ui <- function(request) {
         h2("Swim Experience"),
         p("Please list up to five documented marathon swims you have completed, especially swims from the past 1-3 years."),
         actionButton("add_swim", "Add Documented Swim"),
-        hidden(actionButton("remove_swim", "Delete Most Recent")),
+        hidden(actionButton("remove_swim", "Delete Last")),
         div(id = "doc_swims"),
         hr(),
         p("You may wish to provide additional information about your 
@@ -631,16 +624,13 @@ ui <- function(request) {
         
         p("Please read the following two statements. 
            If they are true, please check the boxes."),
-        
         p("1. To the best of my knowledge, I am in excellent general health 
           and have not omitted any information which might be 
           relevant to my ability to swim the Santa Barbara Channel"),
         reqd(checkboxInput("med1", "Yes, this is true")),
-        
         p("2. I have been examined by a medical doctor within the past 12 months, 
           and have been specifically cleared to undertake this event."),
         reqd(checkboxInput("med2", "Yes, this is true")),
-        
         reqd(dateInput("med_date", "Date of Medical Exam")),
         uiOutput("valid_page5")
       ),
@@ -663,9 +653,7 @@ ui <- function(request) {
         )}),
 
         checkboxInput("waiver_box", 
-          label = "I have read this waiver and release of liability, fully understand its terms, 
-          understand that I have given up substantial rights by signing it, 
-          and have signed it freely and voluntarily without any inducement.",
+          label = "I have read this waiver and release of liability, fully understand its terms, understand that I have given up substantial rights by signing it, and have signed it freely and voluntarily without any inducement.",
           width = "100%"
         ),
         reqd(textInput("waiver_sig", 
