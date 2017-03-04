@@ -1,5 +1,5 @@
 # {{input$s_name}}
-## {{ifelse(input$route=="Anacapa to mainland","Anacapa to mainland",input$route_other)}}
+## {{ ifelse(input$route=="Anacapa to mainland", "Anacapa to mainland", ifelse(input$alt_start=="not listed here", input$custom_route, paste(input$alt_start, "to", input$alt_finish))) }}
 ## {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%B %d, %Y")}}
 
 ---

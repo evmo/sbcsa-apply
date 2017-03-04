@@ -5,11 +5,11 @@ days_in_month <- function(month) {
     else 31
 }
 
-# page_valid_to_green <- function(page) {
-#   validation = paste0("validation", page)
-#   selector = paste0(".nav li:nth-child(", page, ") a")
-# 	observe({
-#     if (is.null(do.call(validation, list()))) {
-#       shinyjs::addClass(class = "green", selector = selector)
-#     }
-# }
+need_initial <- function(input, n) {
+  need(input[[paste0("initial", n)]] != "", 
+       paste0("Please initial item #", n))
+}
+
+greenify <- function(n) {
+  addClass(class = "green", selector = paste0(".nav li:nth-child(", n, ") a"))
+}

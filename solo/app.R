@@ -40,8 +40,16 @@ server <- function(input, output, session) {
     if (input$other_citizen == T) shinyjs::show("s_citizenship") 
     else                           shinyjs::hide("s_citizenship")
 
-    if (input$route == "some other route") shinyjs::show("route_other")
-    else                                   shinyjs::hide("route_other")
+    if (input$route == "some other route") shinyjs::show("alt_route")
+    else                                   shinyjs::hide("alt_route")
+
+    if (input$alt_start == "not listed here") {
+      shinyjs::show("custom_route")
+      shinyjs::hide("alt_finish_ui")
+    } else {
+      shinyjs::hide("custom_route")
+      shinyjs::show("alt_finish_ui")
+    }
 
     if (input$boat == "BOAT NOT LISTED") shinyjs::show("boat_pilot_other")
     else                                 shinyjs::hide("boat_pilot_other")
@@ -73,6 +81,12 @@ server <- function(input, output, session) {
   # display already-inputted splash date on "Swim" tab
   output$splash_date_disp <- renderUI({
     p(input$splash_date)
+  })
+
+  output$alt_finish_ui <- renderUI({
+    choices <- c(islands[islands != input$alt_start], "circumnavigation")
+    selectInput("alt_finish", "Finish Location", choices = choices, 
+                selected = "mainland", selectize = F)
   })
   
   # calculate age on date of swim
@@ -199,15 +213,26 @@ server <- function(input, output, session) {
   
   validation2 <- function() {
     validate(
-      need(input$boat != "[SELECT]",
-           "Please select a boat"
+      need(input$boat != "[SELECT]", "Please select a boat"),
+      need(
+        !(input$alt_start == "Catalina Island" & input$alt_finish == "mainland"),
+        "Route is not sanctioned by the SBCSA"
       ),
-      need(input$route == "Anacapa to mainland" | 
-        (input$route == "some other route" & input$route_other != ""),
-            "Please describe the route"
+      need(
+        !(input$alt_start == "mainland" & input$alt_finish == "Catalina Island"),
+        "Route is not sanctioned by the SBCSA"
       ),
-      need(input$splash_date >= input$harbor_date,
-            "Splash date must be after harbor departure"
+      need(
+        !(input$alt_start == "Catalina Island" & input$alt_finish == "circumnavigation"),
+        "Route is not sanctioned by the SBCSA"
+      ),
+      need(
+        !(input$alt_start == "mainland" & input$alt_finish == "circumnavigation"),
+        "LOL"
+      ),
+      need(
+        input$splash_date >= input$harbor_date,
+          "Splash date must be after harbor departure"
       )
     )
   }
@@ -258,17 +283,12 @@ server <- function(input, output, session) {
 
   validation6 <- function() {
     validate(
-      need(input$initial1 != "", "Please initial item #1"),
-      need(input$initial2 != "", "Please initial item #2"),
-      need(input$initial3 != "", "Please initial item #3"),
-      need(input$initial4 != "", "Please initial item #4"),
-      need(input$initial5 != "", "Please initial item #5"),
-      need(input$initial6 != "", "Please initial item #6"),
-      need(input$initial7 != "", "Please initial item #7"),
-      need(input$initial8 != "", "Please initial item #8"),
-      need(input$initial9 != "", "Please initial item #9"),
-      need(input$initial10 != "", "Please initial item #10"),
-      need(input$initial11 != "", "Please initial item #11"),
+      need_initial(input, 1), need_initial(input, 2),
+      need_initial(input, 3), need_initial(input, 4),
+      need_initial(input, 5), need_initial(input, 6),
+      need_initial(input, 7), need_initial(input, 8),
+      need_initial(input, 9), need_initial(input, 10),
+      need_initial(input, 11),
       need(input$waiver_box,      "Please check the box"),
       need(input$waiver_sig != "", "Signature is required")
     )
@@ -289,38 +309,15 @@ server <- function(input, output, session) {
 
   output$valid_page7 <- renderUI(validation7())
 
-  observe({
-    if (is.null(validation0())) 
-      addClass(class = "green", selector = ".nav li:nth-child(2) a")  # Start Here
-  })
-  observe({
-    if (is.null(validation1())) 
-      addClass(class = "green", selector = ".nav li:nth-child(3) a")  # Swimmer
-  })
-  observe({
-    if (is.null(validation2())) 
-      addClass(class = "green", selector = ".nav li:nth-child(4) a")  # Swim
-  })
-  observe({
-    if (is.null(validation3())) 
-      addClass(class = "green", selector = ".nav li:nth-child(5) a")  # Support Team
-  })
-  observe({
-    if (is.null(validation4()))
-      addClass(class = "green", selector = ".nav li:nth-child(6) a")  # Experience
-  })
-  observe({
-    if (is.null(validation5())) 
-      addClass(class = "green", selector = ".nav li:nth-child(7) a")  # Medical
-  })
-  observe({
-    if (is.null(validation6())) 
-      addClass(class = "green", selector = ".nav li:nth-child(8) a")  # Waiver
-  })
-  observe({
-    if (is.null(validation7())) 
-      addClass(class = "green", selector = ".nav li:nth-child(9) a")  # Sanction Fees
-  })
+  # turn page tabs green if they pass validation
+  observe(if (is.null(validation0())) greenify(2))
+  observe(if (is.null(validation1())) greenify(3))
+  observe(if (is.null(validation2())) greenify(4))
+  observe(if (is.null(validation3())) greenify(5))
+  observe(if (is.null(validation4())) greenify(6))
+  observe(if (is.null(validation5())) greenify(7))
+  observe(if (is.null(validation6())) greenify(8))
+  observe(if (is.null(validation7())) greenify(9))
     
   observe({
     if (all(is.null( validation0() ),  # if all validations pass...
@@ -516,9 +513,14 @@ ui <- function(request) {
         radioButtons("route", "What route will you be swimming?", 
           choices = c("Anacapa to mainland", "some other route")
         ),
-        hidden(
-          textInput("route_other", "Please describe your proposed route")
-        ),
+        hidden(div(id = "alt_route",
+          column(6, selectInput("alt_start", "Start Location",
+                                choices = islands, 
+                                selected = "Santa Cruz Island",
+                                selectize = F)),
+          column(6, uiOutput("alt_finish_ui"))
+        )),
+        hidden(textInput("custom_route", "Please describe your proposed route")),
         reqd(selectInput("boat", "Escort Boat", choices = boats, selectize = F)),
         hidden(div(id = "boat_pilot_other",
           textInput("boat_other", "Name of Boat"),
