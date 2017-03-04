@@ -8,6 +8,7 @@ library(markdown)
 library(gmailr)
 
 source("fill_sample.R")
+source("../common/func.R")
 countries <- readLines("../_includes/countries.txt")
 islands <- readLines("../_includes/islands.txt")
 boats <- readLines("../_includes/boats.txt")
@@ -22,10 +23,12 @@ server <- function(input, output, session) {
 
   rv <- reactiveValues(v = 0)
 
+  # disable PREVIEW & SUBMIT tabs
   shinyjs::addClass(class = "disabled-link", 
     selector = ".nav li:nth-child(10) a, .nav li:nth-child(11) a")
   
-  observe({  # observers for displaying hidden inputs
+  # observers for toggling hidden inputs
+  observe({  
     if (dev_mode()) shinyjs::show("fill_sample")
 
     if (input$other_citizen == T) shinyjs::show("s_citizenship") 
@@ -58,13 +61,7 @@ server <- function(input, output, session) {
 
   output$dobD_ui <- renderUI({
     req(input$dobM)
-    if (input$dobM %in% c(4, 6, 9, 11))
-      d <- 30
-    else if (input$dobM == 2)
-      d <- 29
-    else
-      d <- 31
-    
+    d <- ifelse(input$dobM=="[SELECT]", 31, days_in_month(input$dobM))
     reqd(selectInput("dobD", "Day", 
                      choices = c("[SELECT]", seq(1, d)), 
                      selectize = F))
@@ -72,13 +69,7 @@ server <- function(input, output, session) {
 
   output$splashD_ui <- renderUI({
     req(input$splashM)
-    if (input$splashM %in% c(4, 6, 9, 11))
-      d <- 30
-    else if (input$splashM == 2)
-      d <- 29
-    else
-      d <- 31
-    
+    d <- ifelse(input$splashM=="[SELECT]", 31, days_in_month(input$splashM))
     reqd(selectInput("splashD", "Day", 
                      choices = c("[SELECT]", seq(1, d)), 
                      selectize = F))
