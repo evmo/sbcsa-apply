@@ -26,6 +26,12 @@ server <- function(input, output, session) {
   # disable PREVIEW & SUBMIT tabs
   shinyjs::addClass(class = "disabled-link", 
     selector = ".nav li:nth-child(10) a, .nav li:nth-child(11) a")
+
+  # fill in all inputs - for testing preview & submit
+  observeEvent(input$fill_sample, {
+    if (dev_mode())
+      fill_sample(session)
+  })
   
   # observers for toggling hidden inputs
   observe({  
@@ -59,14 +65,14 @@ server <- function(input, output, session) {
     else                                shinyjs::hide("new_lifetime")
   })
 
+  # render day-selectInputs based on month of year
   output$dobD_ui <- renderUI({
     req(input$dobM)
-    days <- ifelse(input$dobM=="[SELECT]", 31, days_in_month(input$dobM))
+    days <- ifelse(input$dobM == "[SELECT]", 31, days_in_month(input$dobM))
     reqd(selectInput("dobD", "Day", 
                      choices = c("[SELECT]", seq(1, days)), 
                      selectize = F))
   })
-
   output$splashD_ui <- renderUI({
     req(input$splashM)
     days <- ifelse(input$splashM=="[SELECT]", 31, days_in_month(input$splashM))
@@ -75,19 +81,22 @@ server <- function(input, output, session) {
                      selectize = F))
   })
 
+  # display already-inputted splash date on "Swim" tab
   output$splash_date_disp <- renderUI({
     req(rv$splash)
     p(rv$splash)
   })
   
+  # are dates on "Start Here" page completed?
   dates_filled <- reactive({
-    input$dobY != "[SELECT]" && 
-    input$dobM != "[SELECT]" &&
-    input$dobD != "[SELECT]" &&
+    input$dobY    != "[SELECT]" && 
+    input$dobM    != "[SELECT]" &&
+    input$dobD    != "[SELECT]" &&
     input$splashM != "[SELECT]" &&
     input$splashD != "[SELECT]"
   })
   
+  # calculate age on date of swim
   observe({
     req(dates_filled())
     rv$dob <- as.Date(ISOdate(as.integer(input$dobY),
@@ -98,6 +107,7 @@ server <- function(input, output, session) {
                          input$splashD))
     rv$swim_age <- as.period(interval(start = rv$dob, end = rv$splash))$year
     
+    # toggle under18 parent/guardian inputs
     if (rv$swim_age < 18 && rv$swim_age >= 14) {
       shinyjs::show("under18")
       shinyjs::hide("swimmer_contact")
@@ -111,26 +121,33 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$fill_sample, {
-    if (dev_mode())
-      fill_sample(session)
-  })
-  
   # insertUI for crew members
   rv$crew_count <- 0
   observeEvent(input$add_crew, {
     rv$crew_count <<- rv$crew_count + 1
     crewid <- paste0('crew', rv$crew_count)
-    insertUI(selector = "#crew", "beforeEnd", ui = tagList(div(id = crewid,
-      column(4, textInput(paste0("crew_name", rv$crew_count), "Name")),
-      column(4, textInput(paste0("crew_role", rv$crew_count), "Role")),
-      column(4, textInput(paste0("crew_contact", rv$crew_count), "Contact Phone or Email"))
+    insertUI(selector = "#crew", "beforeEnd", 
+             ui = tagList(div(id = crewid,
+                column(4, 
+                 textInput(paste0("crew_name", rv$crew_count), 
+                           "Name")
+                ),
+                column(4, 
+                 textInput(paste0("crew_role", rv$crew_count), 
+                           "Role")
+                ),
+                column(4, 
+                 textInput(paste0("crew_contact", rv$crew_count), 
+                           "Contact Phone or Email")
+                )
     )))
   })
   
+  # removeUI for crew members
   observeEvent(input$remove_crew, {
     removeUI(selector = paste0('#crew', rv$crew_count))
-    if (rv$crew_count > 0) rv$crew_count <<- rv$crew_count - 1
+    if (rv$crew_count > 0) 
+      rv$crew_count <<- rv$crew_count - 1
   })
   
   # insertUI for documented swims
@@ -139,24 +156,35 @@ server <- function(input, output, session) {
     rv$swim_count <<- rv$swim_count + 1
     swimid <- paste0('swim', rv$swim_count)
     insertUI(selector = "#doc_swims", "beforeEnd", ui = tagList(div(id = swimid,
-      textInput(paste0("swim_name", input$add_swim), 
+              textInput(paste0("swim_name", input$add_swim), 
                 label = paste("Swim", rv$swim_count, "Description"), 
                 width = "100%"),
-      fluidRow(
-        column(2, selectInput(paste0("swim_year", input$add_swim), 
-                              "Year",
-                              choices = seq(2017, 1997))),
-        column(2, textInput(paste0("swim_dist", input$add_swim), "Distance")),
-        column(2, selectInput(paste0("swim_units", input$add_swim), 
-                              "Units",
-                              choices = c("miles", "km"))),
-        column(2, textInput(paste0("swim_hr", input$add_swim), "Hr")),
-        column(2, textInput(paste0("swim_min", input$add_swim), "Min")),
-        column(2, textInput(paste0("swim_temp", input$add_swim), "Temp"))
-      )
+              fluidRow(
+                column(2, selectInput(paste0("swim_year", input$add_swim), 
+                                      "Year",
+                                       choices = seq(2017, 1997))
+                ),
+                column(2, textInput(paste0("swim_dist", input$add_swim), 
+                                    "Distance")
+                ),
+                column(2, selectInput(paste0("swim_units", input$add_swim), 
+                                      "Units",
+                                       choices = c("miles", "km"))
+                ),
+                column(2, textInput(paste0("swim_hr", input$add_swim), 
+                                    "Hr")
+                ),
+                column(2, textInput(paste0("swim_min", input$add_swim), 
+                                    "Min")
+                ),
+                column(2, textInput(paste0("swim_temp", input$add_swim), 
+                                           "Temp")
+                )
+              )
     )))
   })
   
+  # 
   observeEvent(input$remove_swim, {
     n <- rv$swim_count
     removeUI(selector = paste0("#swim", n))
@@ -297,21 +325,37 @@ server <- function(input, output, session) {
   observe({
     if (is.null(validation0())) 
       addClass(class = "green", selector = ".nav li:nth-child(2) a")  # Start Here
+  })
+  observe({
     if (is.null(validation1())) 
       addClass(class = "green", selector = ".nav li:nth-child(3) a")  # Swimmer
+  })
+  observe({
     if (is.null(validation2())) 
       addClass(class = "green", selector = ".nav li:nth-child(4) a")  # Swim
+  })
+  observe({
     if (is.null(validation3())) 
       addClass(class = "green", selector = ".nav li:nth-child(5) a")  # Support Team
+  })
+  observe({
     if (is.null(validation4()))
       addClass(class = "green", selector = ".nav li:nth-child(6) a")  # Experience
+  })
+  observe({
     if (is.null(validation5())) 
       addClass(class = "green", selector = ".nav li:nth-child(7) a")  # Medical
+  })
+  observe({
     if (is.null(validation6())) 
       addClass(class = "green", selector = ".nav li:nth-child(8) a")  # Waiver
+  })
+  observe({
     if (is.null(validation7())) 
       addClass(class = "green", selector = ".nav li:nth-child(9) a")  # Sanction Fees
-
+  })
+    
+  observe({
     if (all(is.null( validation0() ),  # if all validations pass...
             is.null( validation1() ), 
             is.null( validation2() ),
