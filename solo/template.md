@@ -8,14 +8,11 @@ Gender | D.O.B | Age on Swim Date | Citizen
 ------ | ----- | ---------------- | -------
 {{
     gender <- input$s_gender
-    dob <- format(as.Date(rv$dob, 
-                          origin = "1970-01-01"), 
-                          "%Y-%b-%d")
     age <- rv$swim_age
     citizen <- ifelse(input$other_citizen, 
                       input$s_citizenship, 
                       input$s_country)
-    paste(gender, dob, age, citizen, sep = " | ")
+    paste(gender, input$s_dob, age, citizen, sep = " | ")
 }}
 
 ### Contact Info
@@ -38,7 +35,7 @@ Name | Relationship | Email | Phone |
 
 - **Boat:** {{input$boat}}
 - **Depart harbor:** {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%a %b %d %Y")}}, {{paste0(input$harbor_time, ":00")}}
-- **Swimmer in water:** {{format(as.Date(rv$splash, origin="1970-01-01"), "%a %b %d %Y")}}, {{paste0(input$splash_time, ":00")}}
+- **Swimmer in water:** {{format(input$splash_date, "%a %b %d %Y")}}, {{paste0(input$splash_time, ":00")}}
 
 ### Support Team
 

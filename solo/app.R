@@ -65,48 +65,15 @@ server <- function(input, output, session) {
     else                                shinyjs::hide("new_lifetime")
   })
 
-  # render day-selectInputs based on month of year
-  output$dobD_ui <- renderUI({
-    req(input$dobM)
-    days <- ifelse(input$dobM == "[SELECT]", 31, days_in_month(input$dobM))
-    reqd(selectInput("dobD", "Day", 
-                     choices = c("[SELECT]", seq(1, days)), 
-                     selectize = F))
-  })
-  output$splashD_ui <- renderUI({
-    req(input$splashM)
-    days <- ifelse(input$splashM=="[SELECT]", 31, days_in_month(input$splashM))
-    reqd(selectInput("splashD", "Day", 
-                     choices = c("[SELECT]", seq(1, days)), 
-                     selectize = F))
-  })
-
   # display already-inputted splash date on "Swim" tab
   output$splash_date_disp <- renderUI({
-    req(rv$splash)
-    p(rv$splash)
-  })
-  
-  # are dates on "Start Here" page completed?
-  dates_filled <- reactive({
-    input$dobY    != "[SELECT]" && 
-    input$dobM    != "[SELECT]" &&
-    input$dobD    != "[SELECT]" &&
-    input$splashM != "[SELECT]" &&
-    input$splashD != "[SELECT]"
+    p(input$splash_date)
   })
   
   # calculate age on date of swim
   observe({
-    req(dates_filled())
-    rv$dob <- as.Date(ISOdate(as.integer(input$dobY),
-                      which(month.name == input$dobM),
-                      input$dobD))
-    rv$splash <- as.Date(ISOdate(as.integer(input$splashY),
-                         which(month.name == input$splashM),
-                         input$splashD))
-    rv$swim_age <- as.period(interval(start = rv$dob, end = rv$splash))$year
-    
+    rv$swim_age <- as.period(interval(start = input$s_dob, 
+                                      end = input$splash_date))$year
     # toggle under18 parent/guardian inputs
     if (rv$swim_age < 18 && rv$swim_age >= 14) {
       shinyjs::show("under18")
@@ -195,20 +162,10 @@ server <- function(input, output, session) {
 
   validation0 <- function() {
     validate(
-      need(input$dobY != "[SELECT]" &&
-           input$dobM != "[SELECT]" &&
-           input$dobD != "[SELECT]",
-           "Please enter the swimmer's date of birth."
-      ),
-      need(input$splashM != "[SELECT]" &&
-           input$splashD != "[SELECT]",
-           "Please enter the scheduled date of the swim attempt."
-      ),
-      need(!dates_filled() || rv$swim_age >= 14, 
+      need(rv$swim_age >= 14, 
            "The swimmer must be at least 14 years old on the date of the swim."
       ),
-      need(!dates_filled() || 
-           rv$swim_age < 14 || 
+      need(rv$swim_age < 14 || 
            rv$swim_age >= 18 || 
            input$parent_present,
         "Parent or guardian must be present for the rest of the application."
@@ -456,42 +413,23 @@ ui <- function(request) {
       tabPanel("Start Here",
         includeMarkdown("../_includes/start_here.md"),
         h3("Complete these questions first:"),
-        h4("What is the swimmer's date of birth?"),
         fluidRow(
-          column(4,
-             reqd(selectInput("dobY", "Year", 
-                              choices = c("[SELECT]", seq(year(Sys.Date()) - 13, 
-                                            year(Sys.Date()) - 100)),
-                              selectize = F))
+          column(6,
+            dateInput("s_dob", 
+                      label = "What is the swimmer's date of birth?",
+                      value = "1970-01-01",
+                      startview = "year",
+                      min = Sys.Date() - years(100),
+                      max = Sys.Date() - years(13))
           ),
-          column(4,
-             reqd(selectInput("dobM", "Month", 
-                              choices = c("[SELECT]", month.name), 
-                              selectize = F))
-          ),
-          column(4,
-            uiOutput("dobD_ui")
+          column(6,
+            dateInput("splash_date", 
+                      label = "When is the swim scheduled to begin?",
+                      startview = "year",
+                      min = Sys.Date(),
+                      max = Sys.Date() + years(1))
           )
         ),
-          
-        h4("When is the swim scheduled to begin?"),
-        fluidRow(
-          column(4,
-             reqd(selectInput("splashY", "Year", 
-                              choices = seq(year(Sys.Date()), 
-                                            year(Sys.Date()) + 1),
-                              selectize = F))
-          ),
-          column(4,
-             reqd(selectInput("splashM", "Month", 
-                              choices = c("[SELECT]", month.name), 
-                              selectize = F))
-          ),
-          column(4,
-            uiOutput("splashD_ui")
-          )
-        ),
-
         hidden(div(id = "under18",
           h4("Swimmer will be younger than 18 on the date of the swim.
               Is there a parent or guardian present to help complete 
