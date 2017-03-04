@@ -65,6 +65,11 @@ server <- function(input, output, session) {
     else                                shinyjs::hide("new_lifetime")
   })
 
+  # update harbor_date input with already-entered splash_date
+  observeEvent(input$splash_date, {
+    updateDateInput(session, "harbor_date", value = input$splash_date)
+  })
+
   # display already-inputted splash date on "Swim" tab
   output$splash_date_disp <- renderUI({
     p(input$splash_date)
@@ -195,10 +200,15 @@ server <- function(input, output, session) {
   validation2 <- function() {
     validate(
       need(input$boat != "[SELECT]",
-           "Please select a boat"),
+           "Please select a boat"
+      ),
       need(input$route == "Anacapa to mainland" | 
         (input$route == "some other route" & input$route_other != ""),
-            "Please describe the route")
+            "Please describe the route"
+      ),
+      need(input$splash_date >= input$harbor_date,
+            "Splash date must be after harbor departure"
+      )
     )
   }
   
@@ -613,7 +623,10 @@ ui <- function(request) {
         p("2. I have been examined by a medical doctor within the past 12 months, 
           and have been specifically cleared to undertake this event."),
         reqd(checkboxInput("med2", "Yes, this is true")),
-        reqd(dateInput("med_date", "Date of Medical Exam")),
+        reqd(dateInput("med_date", 
+                       label = "Date of Medical Exam",
+                       min = Sys.Date() - years(1),
+                       max = Sys.Date() + months(6))),
         uiOutput("valid_page5")
       ),
       
