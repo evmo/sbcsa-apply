@@ -83,6 +83,7 @@ server <- function(input, output, session) {
     p(input$splash_date)
   })
 
+  # remove start location from selectInput of finish location
   output$alt_finish_ui <- renderUI({
     choices <- c(islands[islands != input$alt_start], "circumnavigation")
     selectInput("alt_finish", "Finish Location", choices = choices, 
@@ -170,7 +171,7 @@ server <- function(input, output, session) {
     )))
   })
   
-  # 
+  # removeUI for documented swims
   observeEvent(input$remove_swim, {
     n <- rv$swim_count
     removeUI(selector = paste0("#swim", n))
@@ -179,6 +180,7 @@ server <- function(input, output, session) {
   
   # Page Validations ---------------------------------
 
+  # START HERE
   validation0 <- function() {
     validate(
       need(rv$swim_age >= 14, 
@@ -194,6 +196,7 @@ server <- function(input, output, session) {
   
   output$valid_page0 <- renderUI(validation0())
 
+  # THE SWIMMER
   validation1 <- function() {
     validate(
       need(input$s_name != "", 
@@ -211,6 +214,7 @@ server <- function(input, output, session) {
   
   output$valid_page1 <- renderUI(validation1())
   
+  # THE SWIM
   validation2 <- function() {
     validate(
       need(input$boat != "[SELECT]", "Please select a boat"),
@@ -239,6 +243,7 @@ server <- function(input, output, session) {
   
   output$valid_page2 <- renderUI(validation2())
   
+  # SUPPORT CREW
   validation3 <- function() {
     validate(
       need(input$cc_name != "", "Please enter a crew chief")
@@ -247,6 +252,7 @@ server <- function(input, output, session) {
   
   output$valid_page3 <- renderUI(validation3())
   
+  # SWIM EXPERIENCE
   validation4 <- function() {
     validate(
       need(nchar(input$background_details) > 0 |
@@ -272,6 +278,7 @@ server <- function(input, output, session) {
   
   output$valid_page4 <- renderUI(validation4())
   
+  # HEALTH / MEDICAL
   validation5 <- function() {
     validate(
       need(input$med1, "You must agree with statement #1"),
@@ -281,6 +288,7 @@ server <- function(input, output, session) {
   
   output$valid_page5 <- renderUI(validation5())
 
+  # LIABILITY WAIVER
   validation6 <- function() {
     validate(
       need_initial(input, 1), need_initial(input, 2),
@@ -296,6 +304,7 @@ server <- function(input, output, session) {
 
   output$valid_page6 <- renderUI(validation6())
 
+  # SANCTION FEES
   validation7 <- function() {
     validate(
       need(input$payment_choice != "[SELECT]", 
@@ -309,7 +318,7 @@ server <- function(input, output, session) {
 
   output$valid_page7 <- renderUI(validation7())
 
-  # turn page tabs green if they pass validation
+  # turn each page tab green when it passes validation
   observe(if (is.null(validation0())) greenify(2))
   observe(if (is.null(validation1())) greenify(3))
   observe(if (is.null(validation2())) greenify(4))
@@ -344,6 +353,7 @@ server <- function(input, output, session) {
     rv$file_pdf <- file.path(DATADIR, paste0(rv$fn, ".pdf"))
   })
 
+  # generate markdown preview file
   observeEvent(input$gen_markdown, {
     out <- knit_expand("template.md")  # expand R expressions in template
     writeLines(out, rv$file_md)
@@ -353,18 +363,20 @@ server <- function(input, output, session) {
     rv$v <- rv$v + 1
     shinyjs::show("preview")
     shinyjs::show("submit_button")
-    shinyjs::removeClass(
+    shinyjs::removeClass(  # enable SUBMIT tab
         class = "disabled-link", 
         selector = ".nav li:nth-child(11) a"
     )
     shinyjs::addClass(class = "green", selector = ".nav li:nth-child(11) a")
   })
 
+  # display markdown preview
   output$preview <- renderUI({
     rv$v
     includeHTML(rv$file_html)
   })
 
+  # submit actions
   observeEvent(input$submit_app, {
     shinyjs::disable("submit_app")
     shinyjs::show("submit_msg")
