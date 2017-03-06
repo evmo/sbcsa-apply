@@ -1,5 +1,5 @@
 # {{input$s_name}}
-## {{ ifelse(input$route=="Anacapa to mainland", "Anacapa to mainland", ifelse(input$alt_start=="not listed here", input$custom_route, paste(input$alt_start, "to", input$alt_finish))) }}
+## {{ ifelse(input$start=="not listed here", input$custom_route, paste(input$start, "-", input$finish)) }}
 ## {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%B %d, %Y")}}
 
 ---
@@ -33,7 +33,7 @@ Name | Relationship | Email | Phone |
 
 ### Escort Boat
 
-- **Boat:** {{input$boat}}
+- **Boat:** {{ ifelse(input$boat_known=="BOAT NOT LISTED", input$boat_other, input$boat_known) }}
 - **Depart harbor:** {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%a %b %d %Y")}}, {{paste0(input$harbor_time, ":00")}}
 - **Swimmer in water:** {{format(input$splash_date, "%a %b %d %Y")}}, {{paste0(input$splash_time, ":00")}}
 

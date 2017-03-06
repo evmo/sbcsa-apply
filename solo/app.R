@@ -7,17 +7,14 @@ library(magrittr)
 library(markdown)
 library(gmailr)
 
-source("fill_sample.R")
-source("../common/func.R")
 countries <- readLines("../_includes/countries.txt")
 islands <- readLines("../_includes/islands.txt")
-boats <- readLines("../_includes/boats.txt")
-waiver <- readLines("../_includes/waiver.txt")
-reqd <- function(input) div(class = 'required', input)
-dev_mode <- function() if (grepl("dev", getwd())) 1 else 0
+emails <- readLines("../conf/emails.txt")
+source("../common/func.R")
+source("../common/func-ui.R")
 DIR <- if (dev_mode()) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
 DATADIR <- file.path(DIR, "data")
-emails <- readLines("../conf/emails.txt")
+source("fill_sample.R")
 
 server <- function(input, output, session) {
 
@@ -40,22 +37,24 @@ server <- function(input, output, session) {
     if (input$other_citizen == T) shinyjs::show("s_citizenship") 
     else                           shinyjs::hide("s_citizenship")
 
-    if (input$route == "some other route") shinyjs::show("alt_route")
-    else                                   shinyjs::hide("alt_route")
-
-    if (input$alt_start == "not listed here") {
+    if (input$start == "not listed here") {
       shinyjs::show("custom_route")
-      shinyjs::hide("alt_finish_ui")
+      shinyjs::hide("finish_ui")
     } else {
       shinyjs::hide("custom_route")
-      shinyjs::show("alt_finish_ui")
+      shinyjs::show("finish_ui")
     }
 
-    if (input$boat == "BOAT NOT LISTED") shinyjs::show("boat_pilot_other")
-    else                                 shinyjs::hide("boat_pilot_other")
+    if (input$boat_known == "BOAT NOT LISTED") {
+      shinyjs::show("boat_other")
+      shinyjs::show("other_pilot_harbor")
+    } else {
+      shinyjs::hide("boat_other")
+      shinyjs::hide("other_pilot_harbor")
+    }
 
-    if (input$boat == "TO BE DETERMINED") shinyjs::show("boat_notify")
-    else                                  shinyjs::hide("boat_notify")
+    if (input$boat_known == "TO BE DETERMINED") shinyjs::show("boat_notify")
+    else                                        shinyjs::hide("boat_notify")
 
     if (rv$crew_count > 0) shinyjs::show("remove_crew")
     else                   shinyjs::hide("remove_crew")
@@ -79,14 +78,12 @@ server <- function(input, output, session) {
   })
 
   # display already-inputted splash date on "Swim" tab
-  output$splash_date_disp <- renderUI({
-    p(input$splash_date)
-  })
+  output$splash_date_disp <- renderUI(p(input$splash_date))
 
   # remove start location from selectInput of finish location
-  output$alt_finish_ui <- renderUI({
-    choices <- c(islands[islands != input$alt_start], "circumnavigation")
-    selectInput("alt_finish", "Finish Location", choices = choices, 
+  output$finish_ui <- renderUI({
+    choices <- c(islands[islands != input$start], "circumnavigation")
+    selectInput("finish", "Finish Location", choices = choices, 
                 selected = "mainland", selectize = F)
   })
   
@@ -113,21 +110,7 @@ server <- function(input, output, session) {
   observeEvent(input$add_crew, {
     rv$crew_count <<- rv$crew_count + 1
     crewid <- paste0('crew', rv$crew_count)
-    insertUI(selector = "#crew", "beforeEnd", 
-             ui = tagList(div(id = crewid,
-                column(4, 
-                 textInput(paste0("crew_name", rv$crew_count), 
-                           "Name")
-                ),
-                column(4, 
-                 textInput(paste0("crew_role", rv$crew_count), 
-                           "Role")
-                ),
-                column(4, 
-                 textInput(paste0("crew_contact", rv$crew_count), 
-                           "Contact Phone or Email")
-                )
-    )))
+    insert_crew(crewid, rv$crew_count)
   })
   
   # removeUI for crew members
@@ -175,7 +158,8 @@ server <- function(input, output, session) {
   observeEvent(input$remove_swim, {
     n <- rv$swim_count
     removeUI(selector = paste0("#swim", n))
-    if (rv$swim_count > 0) rv$swim_count <<- rv$swim_count - 1
+    if (rv$swim_count > 0) 
+      rv$swim_count <<- rv$swim_count - 1
   })
   
   # Page Validations ---------------------------------
@@ -217,21 +201,21 @@ server <- function(input, output, session) {
   # THE SWIM
   validation2 <- function() {
     validate(
-      need(input$boat != "[SELECT]", "Please select a boat"),
+      need(input$boat_known != "[SELECT]", "Please select a boat"),
       need(
-        !(input$alt_start == "Catalina Island" & input$alt_finish == "mainland"),
+        !(input$start == "Catalina Island" & input$finish == "mainland"),
         "Route is not sanctioned by the SBCSA"
       ),
       need(
-        !(input$alt_start == "mainland" & input$alt_finish == "Catalina Island"),
+        !(input$start == "mainland" & input$finish == "Catalina Island"),
         "Route is not sanctioned by the SBCSA"
       ),
       need(
-        !(input$alt_start == "Catalina Island" & input$alt_finish == "circumnavigation"),
+        !(input$start == "Catalina Island" & input$finish == "circumnavigation"),
         "Route is not sanctioned by the SBCSA"
       ),
       need(
-        !(input$alt_start == "mainland" & input$alt_finish == "circumnavigation"),
+        !(input$start == "mainland" & input$finish == "circumnavigation"),
         "LOL"
       ),
       need(
@@ -430,7 +414,7 @@ ui <- function(request) {
       # -------- START HERE -------------
 
       tabPanel("Start Here",
-        includeMarkdown("../_includes/start_here.md"),
+        includeMarkdown("instructions.md"),
         h3("Complete these questions first:"),
         fluidRow(
           column(6,
@@ -463,20 +447,7 @@ ui <- function(request) {
       
       tabPanel("The Swimmer",
         h2("The Swimmer"),
-        fluidRow(
-          column(6, reqd(textInput("s_name", "Full Name"))),
-          column(6, reqd(selectInput("s_gender", 
-                                     "Gender",
-                                     choices = c("[SELECT]", "female", "male"),
-                                     selectize = F)))
-        ),
-        div(id = "swimmer_contact",
-          fluidRow(
-            column(6, reqd(textInput("s_email", "Email Address"))),
-            column(6, textInput("s_phone", "Phone"))
-          ),
-          reqd(textAreaInput("s_mailing", "Mailing Address", width = 400, height = 125))
-        ),
+        swimmer_info(),
         fluidRow(
           column(6, 
             reqd(selectInput("s_country", 
@@ -522,43 +493,12 @@ ui <- function(request) {
       
       tabPanel("The Swim",
         h2("The Swim"),
-        radioButtons("route", "What route will you be swimming?", 
-          choices = c("Anacapa to mainland", "some other route")
-        ),
-        hidden(div(id = "alt_route",
-          column(6, selectInput("alt_start", "Start Location",
-                                choices = islands, 
-                                selected = "Santa Cruz Island",
-                                selectize = F)),
-          column(6, uiOutput("alt_finish_ui"))
-        )),
-        hidden(textInput("custom_route", "Please describe your proposed route")),
-        reqd(selectInput("boat", "Escort Boat", choices = boats, selectize = F)),
-        hidden(div(id = "boat_pilot_other",
-          textInput("boat_other", "Name of Boat"),
-          textInput("pilot_other", "Name of Pilot")
-        )),
-        hidden(div(id = "boat_notify", 
-          p("Please notify the SBCSA as soon as you have
-              made arrangements with an escort boat.")
-        )),
-        hr(),
-        
-        h4("When is your swim scheduled?"),
-        fluidRow(
-          column(6, dateInput("harbor_date", "Boat Departs Harbor")),
-          column(6, selectInput("harbor_time", "Hour", seq(0, 23)))
-        ),
+        route_boat_date(),
         fluidRow(
           column(6, h5("Splash Date"), uiOutput("splash_date_disp")),
           column(6, selectInput("splash_time", "Hour", seq(0, 23)))
         ),
-        
-        h4("Permission to publicize?"),
-        p("The SBCSA publishes a list of upcoming swim attempts at the 
-          beginning of each season. Do we have your permission to 
-          publicize your attempt, or do you prefer to keep it private?"),
-        radioButtons("publicize", NULL, c("Yes", "No, please keep it private")),
+        publicize(),
         uiOutput("valid_page2")
       ),
     
@@ -566,18 +506,7 @@ ui <- function(request) {
       
       tabPanel("Support Team",
         h2("Support Team"),
-        h4("Crew Chief"),
-        p("Who will be your lead support person on the boat?"),
-        reqd(textInput("cc_name", "Name")),
-        textInput("cc_email", "Email"),
-        textInput("cc_phone", "Phone"),
-        h4("Other Support Crew"),
-        p("Please list all other crew members (besides crew chief).
-            Indicate each crew member's specific role (kayaker,
-            feeder, support swimmer, etc.)"),
-        actionButton("add_crew", "Add Crew Member"),
-        hidden(actionButton("remove_crew", "Delete Last")),
-        div(id = "crew"),
+        support_crew(),
         uiOutput("valid_page3")
       ),
       
@@ -647,27 +576,7 @@ ui <- function(request) {
       # ------ WAIVER & RELEASE OF LIABILITY ---------
       
       tabPanel("Liability Waiver",
-        h2("Liability Waiver"),
-        hidden(div(id = "waiver_parent", 
-          h4("The parent or guardian of the swimmer should read this form,
-            initial each section, and enter an electronic signature at the bottom.")
-        )),
-        h5(waiver[1]), 
-        hr(),
-        p(waiver[2]),
-        
-        lapply(3:13, function(i) { list(
-          p(waiver[i]),
-          reqd(textInput(paste0("initial", i-2), "Initials", width = 70))
-        )}),
-
-        checkboxInput("waiver_box", 
-          label = "I have read this waiver and release of liability, fully understand its terms, understand that I have given up substantial rights by signing it, and have signed it freely and voluntarily without any inducement.",
-          width = "100%"
-        ),
-        reqd(textInput("waiver_sig", 
-                       "Electronic Signature",
-                       placeholder = "Please type your full name")),
+        waiver_ui(),
         uiOutput("valid_page6")
       ),
       

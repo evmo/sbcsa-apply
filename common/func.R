@@ -1,3 +1,7 @@
+reqd <- function(input) div(class = 'required', input)
+
+dev_mode <- function() if (grepl("dev", getwd())) 1 else 0
+
 days_in_month <- function(month) {
 	m <- which(month.name == month)
 	if (m %in% c(4, 6, 9, 11)) 30
