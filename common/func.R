@@ -18,3 +18,8 @@ greenify <- function(n) {
   shinyjs::addClass(class = "green", 
                     selector = paste0(".nav li:nth-child(", n, ") a"))
 }
+
+log_save <- function(app, name, email) {
+  msg <- paste(app, name, email, Sys.time(), sep = "\t")
+  write(msg, "../data/log.tsv", append = T)
+}

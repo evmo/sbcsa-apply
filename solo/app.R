@@ -23,6 +23,9 @@ server <- function(input, output, session) {
   # disable PREVIEW & SUBMIT tabs
   shinyjs::addClass(class = "disabled-link", 
     selector = ".nav li:nth-child(10) a, .nav li:nth-child(11) a")
+  # Save & Return --> red
+  shinyjs::addClass(class = "red", 
+    selector = ".nav li:nth-child(12) a")
 
   # fill in all inputs - for testing preview & submit
   observeEvent(input$fill_sample, {
@@ -400,6 +403,10 @@ server <- function(input, output, session) {
     filename = "SBSCA_sanction_app.pdf",
     content <- function(file) file.copy(rv$file_pdf, file)
   )
+
+  onBookmark(function(state) {
+    log_save("solo", input$s_name, input$s_email)
+  })
 }
 
 ui <- function(request) {

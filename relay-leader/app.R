@@ -23,7 +23,12 @@ server <- function(input, output, session) {
   # disable SUBMIT tab
   shinyjs::addClass(class = "disabled-link", 
                     selector = ".nav li:nth-child(6) a")
+  # Save & Return --> red
+  shinyjs::addClass(class = "red", 
+    selector = ".nav li:nth-child(7) a")
+  # Intro page --> green
   greenify(2)
+  # don't need to know gender
   shinyjs::hide("s_gender")
 
   # fill in all inputs - for testing preview & submit
@@ -222,6 +227,10 @@ server <- function(input, output, session) {
                     collapse = ",")
       )
     })
+  })
+
+  onBookmark(function(state) {
+    log_save("leader", input$s_name, input$s_email)
   })
 }
 
