@@ -62,6 +62,10 @@ server <- function(input, output, session) {
     if (rv$crew_count > 0) shinyjs::show("remove_crew")
     else                   shinyjs::hide("remove_crew")
   })
+
+  observeEvent(input$splash_date, {
+    updateDateInput(session, "harbor_date", value = input$splash_date)
+  })
   
   output$team_members <- renderUI({
     if (input$team_size == "[SELECT]") NULL
