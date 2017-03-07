@@ -92,8 +92,9 @@ server <- function(input, output, session) {
   
   # calculate age on date of swim
   observe({
-    rv$swim_age <- as.period(interval(start = input$s_dob, 
-                                      end = input$splash_date))$year
+    rv$swim_age <- lubridate::as.period(
+                    lubridate::interval(start = input$s_dob, 
+                                        end = input$splash_date))$year
     # toggle under18 parent/guardian inputs
     if (rv$swim_age < 18 && rv$swim_age >= 14) {
       shinyjs::show("under18")
