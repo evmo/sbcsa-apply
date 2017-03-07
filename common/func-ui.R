@@ -19,6 +19,7 @@ swimmer_info <- function() {
 
 route_boat_date <- function() {
   boats <- readLines("../_includes/boats.txt")
+  islands <- readLines("../_includes/islands.txt")
   list(
     div(id = "route", fluidRow(
     column(6, reqd(selectInput("start", "Start Location",
