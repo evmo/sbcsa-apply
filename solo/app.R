@@ -92,8 +92,8 @@ server <- function(input, output, session) {
   
   # calculate age on date of swim
   observe({
-    rv$swim_age <- as.period(interval(start = as.Date(input$s_dob), 
-                                      end = as.Date(input$splash_date)))$year
+    rv$swim_age <- as.period(interval(start = input$s_dob, 
+                                      end = input$splash_date))$year
     # toggle under18 parent/guardian inputs
     if (rv$swim_age < 18 && rv$swim_age >= 14) {
       shinyjs::show("under18")
@@ -436,7 +436,8 @@ ui <- function(request) {
           column(6,
             dateInput("splash_date", 
                       label = "When is the swim scheduled to begin?",
-                      startview = "year",
+                      value = Sys.Date(),
+                      startview = "month",
                       min = Sys.Date(),
                       max = Sys.Date() + years(1))
           )
