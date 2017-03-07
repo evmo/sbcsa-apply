@@ -4,3 +4,4 @@ shiny_bookmarks/
 data/
 *.pdf
 conf/
+relay-leader/.httr-oauth

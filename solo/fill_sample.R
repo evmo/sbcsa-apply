@@ -1,7 +1,4 @@
 fill_sample <- function(session) {
-  updateSelectInput(session, 'dobY', selected = '1970')
-  updateSelectInput(session, 'dobM', selected = 'December')
-  updateSelectInput(session, 'splashM', selected = 'August')
   updateTextInput(session, 's_name', value = 'Matthew Webb')
   updateTextInput(session, 's_email', value = 'mwebb@channelswimmingassocation.com')
   updateSelectInput(session, 's_gender', selected = 'male')
@@ -12,8 +9,7 @@ fill_sample <- function(session) {
   updateTextInput(session, 'ec_rel', value = 'spouse')
   updateTextInput(session, 'ec_phone', value = '212-121-2121')
   updateTextInput(session, 'ec_email', value = 'mchaddock@gmail.com')
-  updateRadioButtons(session, 'route', selected = 'Anacapa to mainland')
-  updateSelectInput(session, 'boat', selected = 'Tuna Thumper')
+  updateSelectInput(session, 'boat_known', selected = 'Tuna Thumper')
   updateTextInput(session, 'cc_name', value = "Tabloid Terry")
   updateTextInput(session, 'cc_email', value = "tterry@hotmail.com")
   updateCheckboxInput(session, 'more_background', value = 1)

@@ -325,8 +325,9 @@ server <- function(input, output, session) {
       shinyjs::removeClass(            # enable preview
         class = "disabled-link", 
         selector = ".nav li:nth-child(10) a"
-      )}
-      shinyjs::addClass(class = "green", selector = ".nav li:nth-child(10) a")
+      )
+      greenify(10)
+    }
   })
 
   # construct output file paths
@@ -365,7 +366,7 @@ server <- function(input, output, session) {
     shinyjs::disable("submit_app")
     shinyjs::show("submit_msg")
     shinyjs::hide("error")
-    tryCatch({07
+    tryCatch({
       # convert html to pdf
       system(paste("wkhtmltopdf", rv$file_html, rv$file_pdf))
       # email notification
@@ -640,18 +641,14 @@ ui <- function(request) {
           h4("Application submitted. If you would like to download a copy
             for your records, please click this button:"),
           downloadButton("download"),
-          includeMarkdown("../_includes/next_steps.md")
+          includeMarkdown("next_steps.md")
         ))
       ),
       
       # --------- SAVE & RETURN -----------
       
       tabPanel("Save & Return Later", 
-        h2("Save and Return Later"),
-        p("Click to save your data and return later."),
-        p("A small window will pop up - copy the URL to your computer.
-           To return to your application, enter this URL into your browser."),
-        bookmarkButton()
+        save_return_ui()
       )
     )
   )

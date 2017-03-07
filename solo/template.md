@@ -39,7 +39,11 @@ Name | Relationship | Email | Phone |
 
 ### Support Team
 
-**Crew chief:** {{input$cc_name}} - {{input$cc_email}} - {{input$cc_phone}}
+#### Crew Chief
+
+Name | Email | Phone
+---- | ----- | -----
+{{input$cc_name}} | {{input$cc_email}} | {{input$cc_phone}}
 
 Name | Role | Contact
 ---- | ---- | -------

@@ -20,13 +20,13 @@ swimmer_info <- function() {
 route_boat_date <- function() {
   boats <- readLines("../_includes/boats.txt")
   list(
-    div(id = "route",
+    div(id = "route", fluidRow(
     column(6, reqd(selectInput("start", "Start Location",
       choices = islands, 
       selected = "Anacapa Island",
       selectize = F))),
     column(6, uiOutput("finish_ui"))
-    ),
+    )),
     hidden(textInput("custom_route", "Please describe your proposed route")),
     div(id = "boat", fluidRow(
       column(6,
@@ -125,4 +125,14 @@ waiver_ui <- function() {
                      "Electronic Signature",
                      placeholder = "Please type your full name"))
     )
+}
+
+save_return_ui <- function() {
+  list(
+    h2("Save and Return Later"),
+    p("Click to save your data and return later."),
+    p("A small window will pop up - copy the URL to your computer.
+       To return to your application, enter this URL into your browser."),
+    bookmarkButton()
+  )
 }

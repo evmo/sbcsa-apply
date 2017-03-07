@@ -15,5 +15,6 @@ need_initial <- function(input, n) {
 }
 
 greenify <- function(n) {
-  addClass(class = "green", selector = paste0(".nav li:nth-child(", n, ") a"))
+  shinyjs::addClass(class = "green", 
+                    selector = paste0(".nav li:nth-child(", n, ") a"))
 }
