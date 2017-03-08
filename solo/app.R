@@ -1,3 +1,5 @@
+#------------------ SOLO APP ---------------------
+
 library(shiny)
 library(shinyjs)
 library(knitr)
@@ -21,8 +23,8 @@ server <- function(input, output, session) {
   rv <- reactiveValues(v = 0)
 
   # disable PREVIEW & SUBMIT tabs
-  shinyjs::addClass(class = "disabled-link", 
-    selector = ".nav li:nth-child(10) a, .nav li:nth-child(11) a")
+  disable(10)
+  disable(11)
   # Save & Return --> red
   shinyjs::addClass(class = "red", 
     selector = ".nav li:nth-child(12) a")
@@ -92,6 +94,8 @@ server <- function(input, output, session) {
   
   # calculate age on date of swim
   observe({
+    req(is_date(input$s_dob))
+    req(is_date(input$splash_date))
     rv$swim_age <- as.period(interval(start = input$s_dob, 
                                       end = input$splash_date))$year
     # toggle under18 parent/guardian inputs
@@ -164,172 +168,51 @@ server <- function(input, output, session) {
     if (rv$swim_count > 0) 
       rv$swim_count <<- rv$swim_count - 1
   })
-  
-  # Page Validations ---------------------------------
 
-  # START HERE
-  validation0 <- function() {
-    validate(
-      need(rv$swim_age >= 14, 
-           "The swimmer must be at least 14 years old on the date of the swim."
-      ),
-      need(rv$swim_age < 14 || 
-           rv$swim_age >= 18 || 
-           input$parent_present,
-        "Parent or guardian must be present for the rest of the application."
-      )
-    )
-  }
-  
-  output$valid_page0 <- renderUI(validation0())
+  #----------- PAGE VALIDATIONS ----------------#
 
-  # THE SWIMMER
-  validation1 <- function() {
-    validate(
-      need(input$s_name != "", 
-           "Please enter your name"),
-      need(grepl(".+@.+\\..+", input$s_email) || grepl(".+@.+\\..+", input$p_email), 
-           "Please enter a valid email address"),
-      need(input$s_mailing != "" || input$p_mailing != "", 
-           "Please enter a mailing address"),
-      need(input$s_country != "[SELECT]", "Please select a country"),
-      need(input$other_citizen == F | input$s_citizenship != "[SELECT]",
-            "Please select a country of citizenship"),
-      need(input$ec_name != "", "Please list an emergency contact")
-    )
-  }
-  
-  output$valid_page1 <- renderUI(validation1())
-  
-  # THE SWIM
-  validation2 <- function() {
-    validate(
-      need(input$boat_known != "[SELECT]", "Please select a boat"),
-      need(
-        !(input$start == "Catalina Island" & input$finish == "mainland"),
-        "Route is not sanctioned by the SBCSA"
-      ),
-      need(
-        !(input$start == "mainland" & input$finish == "Catalina Island"),
-        "Route is not sanctioned by the SBCSA"
-      ),
-      need(
-        !(input$start == "Catalina Island" & input$finish == "circumnavigation"),
-        "Route is not sanctioned by the SBCSA"
-      ),
-      need(
-        !(input$start == "mainland" & input$finish == "circumnavigation"),
-        "LOL"
-      ),
-      need(
-        input$splash_date >= input$harbor_date,
-          "Splash date must be after harbor departure"
-      )
-    )
-  }
-  
-  output$valid_page2 <- renderUI(validation2())
-  
-  # SUPPORT CREW
-  validation3 <- function() {
-    validate(
-      need(input$cc_name != "", "Please enter a crew chief")
-    )
-  }
-  
-  output$valid_page3 <- renderUI(validation3())
-  
-  # SWIM EXPERIENCE
-  validation4 <- function() {
-    validate(
-      need(nchar(input$background_details) > 0 |
-        (!is.null(input$swim_name1) && 
-            input$swim_name1 != "" &&
-            input$swim_dist1 != ""),
-        "Please enter at least one documented swim, or provide additional details."
-      ),
-      need(input$feed_plan != "", 
-           "Please enter a feed plan"),
-      need(input$feed_experience != "", 
-           "Please enter experience with feed plan"),
-      need(input$stroke_rate != "", 
-           "Please enter stroke rate"),
-      need(input$breathing != "[SELECT]",
-           "Please select a breathing pattern"),
-      need(input$hypothermia != "", 
-           "Please enter hypothermia experience"),
-      need(input$night_swimming != "", 
-           "Please enter night swimming experience")
-    )
-  }
-  
-  output$valid_page4 <- renderUI(validation4())
-  
-  # HEALTH / MEDICAL
-  validation5 <- function() {
-    validate(
-      need(input$med1, "You must agree with statement #1"),
-      need(input$med2, "You must agree with statement #2")
-    )
-  }
-  
-  output$valid_page5 <- renderUI(validation5())
+  source("validations.R", local = T)$value
 
-  # LIABILITY WAIVER
-  validation6 <- function() {
-    validate(
-      need_initial(input, 1), need_initial(input, 2),
-      need_initial(input, 3), need_initial(input, 4),
-      need_initial(input, 5), need_initial(input, 6),
-      need_initial(input, 7), need_initial(input, 8),
-      need_initial(input, 9), need_initial(input, 10),
-      need_initial(input, 11),
-      need(input$waiver_box,      "Please check the box"),
-      need(input$waiver_sig != "", "Signature is required")
-    )
-  }
+  output$valid_page0 <- renderUI(renderValid(v0(), f0))
+  output$valid_page1 <- renderUI(renderValid(v1(), f1))
+  output$valid_page2 <- renderUI(renderValid(v2(), f2))
+  output$valid_page3 <- renderUI(renderValid(v3(), f3))
+  output$valid_page4 <- renderUI(renderValid(v4(), f4))
+  output$valid_page5 <- renderUI(renderValid(v5(), f5))
+  output$valid_page6 <- renderUI(renderValid(v6(), f6))
+  output$valid_page7 <- renderUI(renderValid(v7(), f7))
 
-  output$valid_page6 <- renderUI(validation6())
+  observe(toggle_green(2, is_valid(v0())))
+  observe(toggle_green(3, is_valid(v1())))
+  observe(toggle_green(4, is_valid(v2())))
+  observe(toggle_green(5, is_valid(v3())))
+  observe(toggle_green(6, is_valid(v4())))
+  observe(toggle_green(7, is_valid(v5())))
+  observe(toggle_green(8, is_valid(v6())))
+  observe(toggle_green(9, is_valid(v7())))
 
-  # SANCTION FEES
-  validation7 <- function() {
-    validate(
-      need(input$payment_choice != "[SELECT]", 
-            "Please select a payment method"),
-      need(input$current_lifetime != "[SELECT]", 
-            "Please indicate your lifetime member status"),
-      need(input$cancel_policy, 
-            "Please check the box that you understand the cancellation policy")
-    )
-  }
+  all_valid <- reactive({
+    all(is_valid(v0()), 
+        is_valid(v1()), 
+        is_valid(v2()), 
+        is_valid(v3()),
+        is_valid(v4()), 
+        is_valid(v5()), 
+        is_valid(v6()), 
+        is_valid(v7()))
+  })
 
-  output$valid_page7 <- renderUI(validation7())
-
-  # turn each page tab green when it passes validation
-  observe(if (is.null(validation0())) greenify(2))
-  observe(if (is.null(validation1())) greenify(3))
-  observe(if (is.null(validation2())) greenify(4))
-  observe(if (is.null(validation3())) greenify(5))
-  observe(if (is.null(validation4())) greenify(6))
-  observe(if (is.null(validation5())) greenify(7))
-  observe(if (is.null(validation6())) greenify(8))
-  observe(if (is.null(validation7())) greenify(9))
-    
+  # if all page validations pass, enable preview tab
   observe({
-    if (all(is.null( validation0() ),  # if all validations pass...
-            is.null( validation1() ), 
-            is.null( validation2() ),
-            is.null( validation3() ),
-            is.null( validation4() ),
-            is.null( validation5() ),
-            is.null( validation6() ),
-            is.null( validation7() ) 
-      )) {
-      shinyjs::removeClass(            # enable preview
-        class = "disabled-link", 
-        selector = ".nav li:nth-child(10) a"
-      )
+    req(!is.na(all_valid()))
+    if (all_valid()) {
+      undisable(10)
       greenify(10)
+    } else {
+      disable(10)
+      degreen(10)
+      disable(11)
+      degreen(11)
     }
   })
 
@@ -351,11 +234,8 @@ server <- function(input, output, session) {
     rv$v <- rv$v + 1
     shinyjs::show("preview")
     shinyjs::show("submit_button")
-    shinyjs::removeClass(  # enable SUBMIT tab
-        class = "disabled-link", 
-        selector = ".nav li:nth-child(11) a"
-    )
-    shinyjs::addClass(class = "green", selector = ".nav li:nth-child(11) a")
+    undisable(11)  # enable submit tab
+    greenify(11)
   })
 
   # display markdown preview
@@ -442,12 +322,7 @@ ui <- function(request) {
                       max = Sys.Date() + years(1))
           )
         ),
-        hidden(div(id = "under18",
-          h4("Swimmer will be younger than 18 on the date of the swim.
-              Is there a parent or guardian present to help complete 
-              the rest of the application?"),
-          checkboxInput("parent_present", "Yes")
-        )),
+        under18(),
         hidden(actionButton("fill_sample", "Fill in sample data")),
         uiOutput("valid_page0")
       ),
@@ -474,27 +349,8 @@ ui <- function(request) {
           selectInput("s_citizenship", "Citizenship", choices = countries)
         ),
 
-        hidden(div(id = "parent_contact",
-          h4("Parent/Guardian Contact Info"),
-          reqd(textInput("p_name", "Parent - Full Name")),
-          fluidRow(
-            column(6, reqd(textInput("p_email", "Email Address"))),
-            column(6, textInput("p_phone", "Phone"))
-          ),
-          reqd(textAreaInput("p_mailing", "Mailing Address", width = 400, height = 125))
-        )),
-
-        h3("Emergency Contact Person"),
-        p("Please list an emergency contact person who will 
-            be on land during the swim."),
-        fluidRow(
-          reqd(column(6, textInput("ec_name", "Name"))),
-          column(6, textInput("ec_rel", "Relationship to swimmer"))
-        ),
-        fluidRow(
-          column(6, textInput("ec_phone", "Phone")),
-          column(6, textInput("ec_email", "Email"))
-        ),
+        parent_contact(),
+        emerg_contact(),
         uiOutput("valid_page1")
       ),
       

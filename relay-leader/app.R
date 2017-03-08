@@ -1,3 +1,5 @@
+#------------------ RELAY LEADER APP ---------------------
+
 library(shiny)
 library(shinyjs)
 library(knitr)
@@ -122,77 +124,33 @@ server <- function(input, output, session) {
                 selected = "mainland", selectize = F)
   })
 
-  validation1 <- function() {
-    validate(
-      need(input$s_name != "", 
-           "Please enter your name"),
-      need(grepl(".+@.+\\..+", input$s_email), 
-           "Please enter a valid email address"),
-      need(input$s_mailing != "", 
-           "Please enter a mailing address")
-    )
-  }
+  #----------- PAGE VALIDATIONS ----------------#
 
-  output$valid_page1 <- renderUI(validation1())
+  source("validations.R", local = T)$value
 
-  validation2 <- function() {
-    validate(
-      need(input$team_name != "",
-            "Please enter a team name"),
-      need(input$team_size != "[SELECT]",
-            "Please select a team size (minimum 2, maximum 6)"),
-      need(input$leg_duration > 30,
-            "Please enter a valid leg duration (minimum 30 minutes)"),
-      need(input$cc_name != "",
-            "Please enter a crew chief")
-    )
-  }
+  output$valid_page1 <- renderUI(renderValid(v1(), f1))
+  output$valid_page2 <- renderUI(renderValid(v2(), f2))
+  output$valid_page3 <- renderUI(renderValid(v3(), f3))
 
-  output$valid_page2 <- renderUI(validation2())
+  observe(toggle_green(3, is_valid(v1())))
+  observe(toggle_green(4, is_valid(v2())))
+  observe(toggle_green(5, is_valid(v3())))
 
-  validation3 <- function() {
-    validate(
-      need(input$boat_known != "[SELECT]", "Please select a boat"),
-      need(
-        !(input$start == "Catalina Island" & input$finish == "mainland"),
-        "Route is not sanctioned by the SBCSA"
-      ),
-      need(
-        !(input$start == "mainland" & input$finish == "Catalina Island"),
-        "Route is not sanctioned by the SBCSA"
-      ),
-      need(
-        !(input$start == "Catalina Island" & input$finish == "circumnavigation"),
-        "Route is not sanctioned by the SBCSA"
-      ),
-      need(
-        !(input$start == "mainland" & input$finish == "circumnavigation"),
-        "LOL"
-      ),
-      need(
-        input$splash_date >= input$harbor_date,
-          "Splash date must be after harbor departure"
-      )
-    )
-  }
+  all_valid <- reactive({
+    all(is_valid(v1()), 
+        is_valid(v2()), 
+        is_valid(v3()))
+  })
 
-  output$valid_page3 <- renderUI(validation3())
-
-  # turn each page tab green when it passes validation
-  observe(if (is.null(validation1())) greenify(3))
-  observe(if (is.null(validation2())) greenify(4))
-  observe(if (is.null(validation3())) greenify(5))
-
+  # if all page validations pass, enable preview tab
   observe({
-    if (all(is.null( validation1() ),  # if all validations pass...
-            is.null( validation2() ), 
-            is.null( validation3() )
-      )) {
-      shinyjs::removeClass(            # enable preview
-        class = "disabled-link", 
-        selector = ".nav li:nth-child(6) a"
-      )
+    req(!is.na(all_valid()))
+    if (all_valid()) {
+      undisable(6)
       greenify(6)
+    } else {
+      disable(6)
+      degreen(6)
     }
   })
 
@@ -207,14 +165,14 @@ server <- function(input, output, session) {
       out <- knit_expand("template.md")  # expand R expressions in template
       writeLines(out, file_md)
       # email notification
-      # options("gmailr.httr_oath_cache" = 'gm_auth')
-      # gmail_auth()
-      # mime("Reply-To" = input$s_email) %>%
-      #   to(emails) %>% 
-      #   from(emails) %>%
-      #   subject(paste0("SBCSA team leader app for ", input$team_name)) %>%
-      #   attach_file(file_md) %>%
-      #   send_message
+      options("gmailr.httr_oath_cache" = 'gm_auth')
+      gmail_auth()
+      mime("Reply-To" = input$s_email) %>%
+        to(emails) %>% 
+        from(emails) %>%
+        subject(paste0("SBCSA team leader app for ", input$team_name)) %>%
+        attach_file(file_md) %>%
+        send_message
     },
     error = function(err) {
       shinyjs::html("error_msg", err$message)
