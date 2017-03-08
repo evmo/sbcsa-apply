@@ -1,57 +1,44 @@
-# {{input$team_name}}
-## {{ ifelse(input$start=="not listed here", input$custom_route, paste(input$start, "-", input$finish)) }}
-## {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%B %d, %Y")}}
+## {{input$s_name}} - {{input$team_name}}
 
----
+Gender | D.O.B | Age on Swim Date 
+------ | ----- | ---------------- 
+{{
+    gender <- input$s_gender
+    age <- rv$swim_age
+    citizen <- ifelse(input$other_citizen, 
+                      input$s_citizenship, 
+                      input$s_country)
+    paste(gender, input$s_dob, age, sep = " | ")
+}}
 
-### Team Leader
+### Contact Info
 
-Name | Email | Phone
----- | ----- | -----
-{{input$s_name}} | {{input$s_email}} | {{input$s_phone}}
+Email | Phone
+----- | -----
+{{input$s_email}} | {{input$s_phone}}
+{{input$p_email}} | {{input$p_phone}}
 
 {{input$s_mailing}}
+{{input$p_mailing}}
 
-### Team Members
+### Emergency Contact
 
-Name | Email
----- | -----
-{{input$member_name1}} | {{input$member_email1}}
-{{input$member_name2}} | {{input$member_email2}}
-{{ if (input$team_size >= 3) paste(input$member_name3, "|", input$member_email3) }}
-{{ if (input$team_size >= 4) paste(input$member_name4, "|", input$member_email4) }}
-{{ if (input$team_size >= 5) paste(input$member_name5, "|", input$member_email5) }}
-{{ if (input$team_size >= 6) paste(input$member_name6, "|", input$member_email6) }}
+Name | Relationship | Email | Phone | 
+---- | ----- | ----- | ---------- |
+{{input$ec_name}} | {{input$ec_rel}} | {{input$ec_email}} | {{input$ec_phone}}
 
-{{ if (input$alt_size > 0) h4("Alternates") }}
+### Swim Experience
 
-Name | Email
----- | -----
-{{ if (input$alt_size >= 1) paste(input$alt_name1, "|", input$alt_email1) }}
-{{ if (input$alt_size == 2) paste(input$alt_name2, "|", input$alt_email2) }}
+{{input$experience}}
 
-**Leg Duration**: {{ input$leg_duration }} minutes.
+### Medical
 
-### Escort Boat
+To the best of my knowledge, I am in excellent general health and have not omitted any information which might be relevant to my ability to swim the Santa Barbara Channel. **Yes**
 
-- **Boat:** {{ ifelse(input$boat_known=="BOAT NOT LISTED", input$boat_other, input$boat_known) }}
-- **Depart harbor:** {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%a %b %d %Y")}}, {{paste0(input$harbor_time, ":00")}}
-- **Swimmer in water:** {{format(input$splash_date, "%a %b %d %Y")}}, {{paste0(input$splash_time, ":00")}}
+I have been examined by a medical doctor within the past 12 months, and have been specifically cleared to undertake this event. **Yes**
 
-### Support Team
+Date of Medical Exam **{{input$med_date}}**
 
-#### Crew Chief
+### Signature
 
-Name | Email | Phone
----- | ----- | -----
-{{input$cc_name}} | {{input$cc_email}} | {{input$cc_phone}}
-
-#### Additional Crew
-
-Name | Role | Contact
----- | ---- | -------
-{{ if (rv$crew_count >= 1) input$crew_name1 }} | {{ if (rv$crew_count >= 1) input$crew_role1 }} | {{ if (rv$crew_count >= 1) input$crew_contact1 }}
-{{ if (rv$crew_count >= 2) input$crew_name2 }} | {{ if (rv$crew_count >= 2) input$crew_role2 }} | {{ if (rv$crew_count >= 2) input$crew_contact2 }}
-{{ if (rv$crew_count >= 3) input$crew_name3 }} | {{ if (rv$crew_count >= 3) input$crew_role3 }} | {{ if (rv$crew_count >= 3) input$crew_contact3 }}
-{{ if (rv$crew_count >= 4) input$crew_name4 }} | {{ if (rv$crew_count >= 4) input$crew_role4 }} | {{ if (rv$crew_count >= 4) input$crew_contact4 }}
-{{ if (rv$crew_count >= 5) input$crew_name5 }} | {{ if (rv$crew_count >= 5) input$crew_role5 }} | {{ if (rv$crew_count >= 5) input$crew_contact5 }}
+{{input$waiver_sig}}

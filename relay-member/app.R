@@ -16,6 +16,7 @@ source("../common/func.R")
 source("../common/func-ui.R")
 DIR <- if (dev_mode()) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
 DATADIR <- file.path(DIR, "data")
+source("fill_sample.R")
 
 server <- function(input, output, session) {
 
@@ -104,19 +105,12 @@ server <- function(input, output, session) {
     shinyjs::show("submit_msg")
     shinyjs::hide("error")
     tryCatch({
-      fn <- gsub(" ", "_", input$team_name) %>% tolower
+      fn <- gsub(" ", "_", 
+              paste(input$team_name, 
+                    input$s_name)) %>% tolower
       file_md <- file.path(DATADIR, paste0(fn, ".md"))
       out <- knit_expand("template.md")  # expand R expressions in template
       writeLines(out, file_md)
-      # email notification
-      # options("gmailr.httr_oath_cache" = 'gm_auth')
-      # gmail_auth()
-      # mime("Reply-To" = input$s_email) %>%
-      #   to(emails) %>% 
-      #   from(emails) %>%
-      #   subject(paste0("SBCSA team leader app for ", input$team_name)) %>%
-      #   attach_file(file_md) %>%
-      #   send_message
     },
     error = function(err) {
       shinyjs::html("error_msg", err$message)
@@ -129,7 +123,7 @@ server <- function(input, output, session) {
       shinyjs::addClass(
         class = "disabled-link", 
         selector = paste(
-                    paste(".nav li:nth-child(", c(2:5, 7), ")", sep = ""), 
+                    paste(".nav li:nth-child(", c(2:6, 8), ")", sep = ""), 
                     collapse = ",")
       )
     })
@@ -155,17 +149,17 @@ ui <- function(request) {
       tabPanel("Start Here",
         includeMarkdown("instructions.md"),
         fluidRow(
-          column(6, dateInput("s_dob", 
+          column(6, reqd(dateInput("s_dob", 
                       label = "What is the swimmer's date of birth?",
                       value = "1970-01-01",
                       startview = "year",
                       min = Sys.Date() - years(100),
-                      max = Sys.Date() - years(13))
+                      max = Sys.Date() - years(13)))
           ),
-          column(6, selectInput("team_name", 
+          column(6, reqd(selectInput("team_name", 
                                 "Relay Team Name", 
                                 choices = c("[SELECT]", teams$name),
-                                selectize = F)
+                                selectize = F))
           )
         ),
         hidden(div(id = "under18",
@@ -193,8 +187,8 @@ ui <- function(request) {
 
       tabPanel("Swim Experience",
         h2("Swim Experience"),
-        textAreaInput("experience", width = 500, height = 300,
-                      "Please describe your ocean swimming experience"),
+        reqd(textAreaInput("experience", width = 500, height = 300,
+                      "Please describe your ocean swimming experience")),
         uiOutput("valid_page2")
       ),
 

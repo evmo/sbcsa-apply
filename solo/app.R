@@ -14,6 +14,7 @@ islands <- readLines("../_includes/islands.txt")
 emails <- readLines("../conf/emails.txt")
 source("../common/func.R")
 source("../common/func-ui.R")
+source("swim_experience_ui.R")
 DIR <- if (dev_mode()) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
 DATADIR <- file.path(DIR, "data")
 source("fill_sample.R")
@@ -252,15 +253,6 @@ server <- function(input, output, session) {
     tryCatch({
       # convert html to pdf
       system(paste("wkhtmltopdf", rv$file_html, rv$file_pdf))
-      # email notification
-      options("gmailr.httr_oath_cache" = 'gm_auth')
-      gmail_auth()
-      mime("Reply-To" = input$s_email) %>%
-        to(emails) %>% 
-        from(emails) %>%
-        subject(paste0("SBCSA sanction application for ", input$s_name)) %>%
-        attach_file(rv$file_pdf) %>%
-        send_message
     },
     error = function(err) {
       shinyjs::html("error_msg", err$message)
@@ -378,39 +370,7 @@ ui <- function(request) {
       # -------- MARATHON SWIMMING EXPERIENCE --------
       
       tabPanel("Swim Experience",
-        h2("Swim Experience"),
-        p("Please list up to five documented marathon swims you have completed, especially swims from the past 1-3 years."),
-        actionButton("add_swim", "Add Documented Swim"),
-        hidden(actionButton("remove_swim", "Delete Last")),
-        div(id = "doc_swims"),
-        hr(),
-        p("You may wish to provide additional information about your 
-          swimming background and training -- especially if your documented 
-          marathon swimming experience is somewhat sparse."),
-        p("Provide more details on swimming background?"),
-        checkboxInput("more_background", "Yes"),
-        hidden(div(id = "more_details",
-          includeMarkdown("../_includes/more_background.md"),
-          textAreaInput("background_details", "Details", width = 400, height = 200)
-        )),
-        reqd(textAreaInput("feed_plan", "What is your feeding plan? 
-                      Product(s)? Frequency? From boat or kayak?",
-                      width = 400, height = 125)),
-        reqd(textAreaInput("feed_experience", "What experience do you have 
-                      using this feed plan on long swims?",
-                      width = 400, height = 125)),
-        reqd(textInput("stroke_rate", "What is your typical stroke rate 
-                  for a swim of this distance (strokes per minute)?")),
-        reqd(selectInput("breathing", "What is your breathing pattern?",
-                    c("[SELECT]", "right only", "left only", "mostly right, but can
-                      breathe bilateral", "mostly left, but can breathe 
-                      bilateral", "bilateral"))),
-        reqd(textAreaInput("hypothermia", "What is your experience (if any) 
-                      with hypothermia in the context of swimming.",
-                      width = 400, height = 100)),
-        reqd(textAreaInput("night_swimming", "What is your experience (if any) 
-                      swimming at night",
-                      width = 400, height = 100)),
+        swim_experience(),
         uiOutput("valid_page4")
       ),
       

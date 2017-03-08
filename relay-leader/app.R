@@ -164,15 +164,6 @@ server <- function(input, output, session) {
       file_md <- file.path(DATADIR, paste0(fn, ".md"))
       out <- knit_expand("template.md")  # expand R expressions in template
       writeLines(out, file_md)
-      # email notification
-      options("gmailr.httr_oath_cache" = 'gm_auth')
-      gmail_auth()
-      mime("Reply-To" = input$s_email) %>%
-        to(emails) %>% 
-        from(emails) %>%
-        subject(paste0("SBCSA team leader app for ", input$team_name)) %>%
-        attach_file(file_md) %>%
-        send_message
     },
     error = function(err) {
       shinyjs::html("error_msg", err$message)
