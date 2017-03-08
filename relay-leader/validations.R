@@ -27,12 +27,14 @@ f2 <- c(
 v3 <- reactive(list(
   input$boat_known != "[SELECT]",
   !(input$start == "Catalina Island" & input$finish == "mainland"),
+  !(input$start == "mainland" & input$finish == "Catalina Island"),
   !(input$start == "Catalina Island" & input$finish == "circumnavigation"),
   !(input$start == "mainland" & input$finish == "circumnavigation"),
   input$splash_date >= input$harbor_date
 ))
 
 f3 <- c(
+  "Please select an escort boat",
   "Route is not sanctioned by the SBCSA",
   "Route is not sanctioned by the SBCSA",
   "Route is not sanctioned by the SBCSA",
