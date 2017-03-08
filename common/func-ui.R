@@ -17,6 +17,47 @@ swimmer_info <- function() {
   )
 }
 
+parent_contact <- function() {
+  list(
+    hidden(div(id = "parent_contact",
+      h4("Parent/Guardian Contact Info"),
+      reqd(textInput("p_name", "Parent - Full Name")),
+      fluidRow(
+        column(6, reqd(textInput("p_email", "Email Address"))),
+        column(6, textInput("p_phone", "Phone"))
+      ),
+      reqd(textAreaInput("p_mailing", "Mailing Address", width = 400, height = 125))
+    ))
+  )
+}
+
+emerg_contact <- function() {
+  list(
+    h3("Emergency Contact Person"),
+    p("Please list an emergency contact person who will 
+        be on land during the swim."),
+    fluidRow(
+      reqd(column(6, textInput("ec_name", "Name"))),
+      column(6, textInput("ec_rel", "Relationship to swimmer"))
+    ),
+    fluidRow(
+      column(6, textInput("ec_phone", "Phone")),
+      column(6, textInput("ec_email", "Email"))
+    )
+  )
+}
+
+under18 <- function() {
+  list(
+    hidden(div(id = "under18",
+      h4("Swimmer will be younger than 18 on the date of the swim.
+          Is there a parent or guardian present to help complete 
+          the rest of the application?"),
+      checkboxInput("parent_present", "Yes")
+    ))
+  )
+}
+
 route_boat_date <- function() {
   boats <- readLines("../_includes/boats.txt")
   islands <- readLines("../_includes/islands.txt")
