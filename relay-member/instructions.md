@@ -1,6 +1,6 @@
 ## Relay Member Application
 
-### Instructions
+#### Thanks for your interest in a Santa Barbara Channel relay swim. We looking forward to working with you.
 
 - The following pages will guide you through the information we need about you and your planned swim. Feel free to browse through the pages to preview the questions.
 - Required fields are <span class="required">outlined in red</span>.

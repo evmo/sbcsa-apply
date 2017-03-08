@@ -1,5 +1,7 @@
 ## Relay Team Leader Application
 
+#### Thanks for your interest in a Santa Barbara Channel relay swim. We looking forward to working with you.
+
 This application should be completed only once per relay, by the relay team leader.
 
 The team leader must be 18 years or older. Relay swimmers can be younger than 18, but the team leader (who may or may not also be swimming) must be 18+.

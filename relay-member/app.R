@@ -16,7 +16,6 @@ source("../common/func.R")
 source("../common/func-ui.R")
 DIR <- if (dev_mode()) "~/dev/sbcsa-apply" else "~/sbcsa-apply"
 DATADIR <- file.path(DIR, "data")
-source("fill_sample.R")
 
 server <- function(input, output, session) {
 
@@ -153,7 +152,7 @@ ui <- function(request) {
         
       # -------- INSTRUCTIONS -------------
 
-      tabPanel("Instructions",
+      tabPanel("Start Here",
         includeMarkdown("instructions.md"),
         fluidRow(
           column(6, dateInput("s_dob", 
