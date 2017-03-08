@@ -216,19 +216,19 @@ ui <- function(request) {
 
       tabPanel("The Team",
         h2("The Team"),
-        textInput("team_name", "Team Name"),
+        reqd(textInput("team_name", "Team Name")),
         fluidRow(
           column(4, 
-            selectInput("team_size", "Number of swimmers", 
-                         choices = c("[SELECT]", seq(2, 6)))
+            reqd(selectInput("team_size", "Number of swimmers", 
+                         choices = c("[SELECT]", seq(2, 6))))
           ),
           column(4, 
-            selectInput("alt_size", "Number of alternates?", 
-                         choices = seq(0, 2))
+            reqd(selectInput("alt_size", "Number of alternates?", 
+                         choices = seq(0, 2)))
           ),
           column(4,
-            numericInput("leg_duration", "Leg duration",
-                          min = 30, value = 60, step = 15)
+            reqd(numericInput("leg_duration", "Leg duration",
+                          min = 30, value = 60, step = 15))
           )
         ),
         hr(),
@@ -246,11 +246,11 @@ ui <- function(request) {
         route_boat_date(),
         fluidRow(
           column(6, 
-            dateInput("splash_date", 
+            reqd(dateInput("splash_date", 
                       label = "When is the swim scheduled to begin?",
                       startview = "year",
                       min = Sys.Date(),
-                      max = Sys.Date() + years(1))
+                      max = Sys.Date() + years(1)))
           ),
           column(6, 
             selectInput("splash_time", "Hour", seq(0, 23))
