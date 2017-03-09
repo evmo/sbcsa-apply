@@ -91,7 +91,7 @@ route_boat_date <- function() {
 
     h4("When is your swim scheduled?"),
     fluidRow(
-      column(6, dateInput("harbor_date", "Boat Departs Harbor")),
+      column(6, reqd(dateInput("harbor_date", "Boat Departs Harbor"))),
       column(6, selectInput("harbor_time", "Hour", seq(0, 23)))
     )
   )

@@ -1,3 +1,5 @@
+# RELAY LEADER VALIDATIONS
+
 v1 <- reactive(list(
   input$s_name != "", 
   grepl(".+@.+\\..+", input$s_email),
