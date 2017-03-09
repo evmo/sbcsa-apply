@@ -246,7 +246,8 @@ ui <- function(request) {
                       label = "When is the swim scheduled to begin?",
                       startview = "year",
                       min = Sys.Date(),
-                      max = Sys.Date() + years(1)))
+                      max = Sys.Date() + years(1),
+                      value = Sys.Date()))
           ),
           column(6, 
             selectInput("splash_time", "Hour", seq(0, 23))
