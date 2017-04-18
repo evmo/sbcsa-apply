@@ -11,6 +11,9 @@ Gender | D.O.B | Age on Swim Date
     paste(gender, input$s_dob, age, sep = " | ")
 }}
 
+- **Current lifetime member:** {{input$current_lifetime}}
+- **Purchase new lifetime?** {{input$new_lifetime}}
+
 ### Contact Info
 
 Email | Phone

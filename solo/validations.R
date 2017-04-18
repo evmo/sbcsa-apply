@@ -1,3 +1,5 @@
+# SOLO - validations
+
 v0 <- reactive(list(
   rv$swim_age >= 14,
   rv$swim_age < 14 || rv$swim_age >= 18 || input$parent_present

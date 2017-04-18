@@ -1,3 +1,5 @@
+# RELAY MEMBER - validations
+
 # START HERE
 v0 <- reactive(list(
   input$team_name != "[SELECT]", 
@@ -32,10 +34,12 @@ f1 <- c(
 
 # SWIM EXPERIENCE
 v2 <- reactive(list(
-  input$experience != ""
+  input$experience != "",
+  input$current_lifetime != "[SELECT]"
 ))
 
-f2 <- c("Please describe your ocean swimming experience")
+f2 <- c("Please describe your ocean swimming experience",
+        "Please indicate your lifetime member status")
 
 # HEALTH / MEDICAL
 v3 <- reactive(list(

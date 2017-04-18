@@ -82,6 +82,8 @@ Year | Swim | Distance | Duration | Temp
 - **Hypothermia experience:** {{input$hypothermia}}
 - **Night swimming experience:** {{input$night_swimming}}
 - **Permission to Publicize:** {{input$publicize}}
+- **Current lifetime member:** {{input$current_lifetime}}
+- **Purchase new lifetime?** {{input$new_lifetime}}
 - **Method of Payment:** {{input$payment_choice}}
 
 ### Medical

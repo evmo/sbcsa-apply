@@ -37,6 +37,8 @@ server <- function(input, output, session) {
   # observers for toggling hidden inputs
   observe({  
     if (dev_mode()) shinyjs::show("fill_sample")
+    if (input$current_lifetime == "No") shinyjs::show("new_lifetime") 
+    else                                shinyjs::hide("new_lifetime")
   })
 
   # calculate age on date of swim
@@ -189,6 +191,19 @@ ui <- function(request) {
         h2("Swim Experience"),
         reqd(textAreaInput("experience", width = 500, height = 300,
                       "Please describe your ocean swimming experience")),
+        h3("Lifetime Membership"),
+        selectInput("current_lifetime",
+                    label = "Are you currently a SBCSA Lifetime Member?",
+                    choices = c("[SELECT]", "No", "Yes")
+        ),
+        hidden(div(id = "new_lifetime",
+                   includeMarkdown("../_includes/lifetime.md"),
+                   radioButtons("lifetime_purchase", width = "100%",
+                                label = "Are you interesting in purchasing a 
+                                Lifetime Membership at this time?", 
+                                choices = c("No", "Yes")
+                   )
+        )),
         uiOutput("valid_page2")
       ),
 
