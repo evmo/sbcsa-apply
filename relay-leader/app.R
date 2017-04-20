@@ -223,8 +223,9 @@ ui <- function(request) {
                          choices = seq(0, 2)))
           ),
           column(4,
-            reqd(numericInput("leg_duration", "Leg duration",
-                          min = 30, value = 60, step = 15))
+            reqd(textInput("leg_duration", 
+                           "Leg duration (minutes)",
+                           placeholder = "minimum 30"))
           )
         ),
         hr(),

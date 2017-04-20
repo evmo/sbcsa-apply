@@ -15,14 +15,14 @@ f1 <- c(
 v2 <- reactive(list(
   input$team_name != "",
   input$team_size != "[SELECT]",
-  input$leg_duration > 30,
+  input$leg_duration != "",
   input$cc_name != ""
 ))
 
 f2 <- c(
   "Please enter a team name",
   "Please select a team size (minimum 2, maximum 6)",
-  "Please enter a valid leg duration (minimum 30 minutes)",
+  "Please enter a leg duration (minimum 30 minutes)",
   "Please enter a crew chief"
 )
 
