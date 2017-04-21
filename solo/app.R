@@ -352,8 +352,9 @@ ui <- function(request) {
         h2("The Swim"),
         route_boat_date(),
         fluidRow(
-          column(6, h5("Splash Date"), uiOutput("splash_date_disp")),
-          column(6, selectInput("splash_time", "Hour", seq(0, 23)))
+          column(4, h5("Splash Date"), uiOutput("splash_date_disp")),
+          column(4, selectInput("splash_time", "Hour", c(12, seq(1, 11)))),
+          column(4, selectInput("splash_ampm", "AM/PM", c("AM", "PM")))
         ),
         publicize(),
         uiOutput("valid_page2")

@@ -35,8 +35,8 @@ Name | Email
 ### Escort Boat
 
 - **Boat:** {{ ifelse(input$boat_known=="BOAT NOT LISTED", input$boat_other, input$boat_known) }}
-- **Depart harbor:** {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%a %b %d %Y")}}, {{paste0(input$harbor_time, ":00")}}
-- **Swimmer in water:** {{format(input$splash_date, "%a %b %d %Y")}}, {{paste0(input$splash_time, ":00")}}
+- **Depart harbor:** {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%a %b %d %Y")}}, {{paste0(input$harbor_time, ":00 ", input$harbor_ampm)}}
+- **Swimmer in water:** {{format(input$splash_date, "%a %b %d %Y")}}, {{paste0(input$splash_time, ":00 ", input$splash_ampm)}}
 
 ### Support Team
 

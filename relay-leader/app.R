@@ -242,7 +242,7 @@ ui <- function(request) {
         h2("The Swim"),
         route_boat_date(),
         fluidRow(
-          column(6, 
+          column(4, 
             reqd(dateInput("splash_date", 
                       label = "When is the swim scheduled to begin?",
                       startview = "year",
@@ -250,9 +250,8 @@ ui <- function(request) {
                       max = Sys.Date() + years(1),
                       value = Sys.Date()))
           ),
-          column(6, 
-            selectInput("splash_time", "Hour", seq(0, 23))
-          )
+          column(4, selectInput("splash_time", "Hour", c(12, seq(1, 11)))),
+          column(4, selectInput("splash_ampm", "AM/PM", c("AM", "PM")))
         ),
         publicize(),
         uiOutput("valid_page3")
