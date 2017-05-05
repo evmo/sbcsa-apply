@@ -132,7 +132,7 @@ server <- function(input, output, session) {
   })
 
   onBookmark(function(state) {
-    log_save("leader", input$s_name, input$s_email)
+    log_save("member", input$s_name, input$s_email)
   })
 }
 
