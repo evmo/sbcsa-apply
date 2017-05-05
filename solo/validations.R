@@ -6,7 +6,6 @@ v0 <- reactive(list(
 ))
 
 f0 <- c(
-  "Please select a team",
   "The swimmer must be at least 14 years old on the date of the swim.",
   "Parent or guardian must be present for the rest of the application."
 )

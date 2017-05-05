@@ -15,16 +15,14 @@ f0 <- c(
 
 # SWIMMER INFO
 v1 <- reactive(list(
-  input$team_name != "",
   input$s_name != "",
-  grepl(".+@.+\\..+", input$s_email), 
-  input$s_mailing != "", 
+  grepl(".+@.+\\..+", input$s_email) || grepl(".+@.+\\..+", input$p_email),
+  input$s_mailing != "" || input$p_mailing != "", 
   input$ec_name != "",
   grepl(".+@.+\\..+", input$ec_email) || grepl("\\d", input$ec_phone)
 ))
 
 f1 <- c(
-  "Please enter a team name",
   "Please enter your name",
   "Please enter a valid email address",
   "Please enter a mailing address",
