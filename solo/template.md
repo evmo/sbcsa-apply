@@ -83,7 +83,7 @@ Year | Swim | Distance | Duration | Temp
 - **Night swimming experience:** {{input$night_swimming}}
 - **Permission to Publicize:** {{input$publicize}}
 - **Current lifetime member:** {{input$current_lifetime}}
-- **Purchase new lifetime?** {{input$new_lifetime}}
+- **Purchase new lifetime?** {{input$lifetime_purchase}}
 - **Method of Payment:** {{input$payment_choice}}
 
 ### Medical

@@ -55,3 +55,7 @@ Name | Role | Contact
 {{ if (rv$crew_count >= 3) input$crew_name3 }} | {{ if (rv$crew_count >= 3) input$crew_role3 }} | {{ if (rv$crew_count >= 3) input$crew_contact3 }}
 {{ if (rv$crew_count >= 4) input$crew_name4 }} | {{ if (rv$crew_count >= 4) input$crew_role4 }} | {{ if (rv$crew_count >= 4) input$crew_contact4 }}
 {{ if (rv$crew_count >= 5) input$crew_name5 }} | {{ if (rv$crew_count >= 5) input$crew_role5 }} | {{ if (rv$crew_count >= 5) input$crew_contact5 }}
+
+### Misc
+
+**Permission to publicize**: {{ input$publicize }}
