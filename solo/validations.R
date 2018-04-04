@@ -57,10 +57,7 @@ f3 <- c(
 )
 
 v4 <- reactive(list(
-  nchar(input$background_details) > 0 |
-        (!is.null(input$swim_name1) && 
-            input$swim_name1 != "" &&
-            input$swim_dist1 != ""),
+  nchar(input$background_details) > 0,
   input$feed_plan != "",
   input$feed_experience != "",
   input$stroke_rate != "",
@@ -70,7 +67,7 @@ v4 <- reactive(list(
 ))
 
 f4 <- c(
-	"Please enter at least one documented swim, or provide additional details.",
+	"Please enter LongSwimsDB URL or other details on your swim background.",
   "Please enter a feed plan",
   "Please enter experience with feed plan",
   "Please enter stroke rate",

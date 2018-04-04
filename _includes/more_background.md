@@ -1,7 +1,12 @@
-Use the box below to tell us more about your swimming background and training. Details might include:
+In this section we would like to learn about your open water swimming experience - especially any documented marathon swims you have done.
 
+Please search for your name in the <a href="https://db.marathonswimmers.org" target="_blank">LongSwims Database</a>. **If you have a LongSwimsDB profile and feel it fairly represents your recent swimming achievements, please simply paste a link to your profile in the box below.**
+
+Otherwise, please use the box to tell us more about your swimming background, training, and recent swims. Details might include:
+
+- Recent organized swim events/races you have done (especially last 3 years).
 - How far you swim each week, on average.
-- Major training swims recently completed.
+- Recent long training swims.
 - Proportion of training you do in open water vs. the pool.
 - Your local body of open water - typical water temps, how long you swim at these temps, etc.
 - Your sustainable swimming pace (minutes/seconds per 100m for pool swimming, or minutes per statute mile for open water).

@@ -12,7 +12,6 @@ fill_sample <- function(session) {
   updateSelectInput(session, 'boat_known', selected = 'Tuna Thumper')
   updateTextInput(session, 'cc_name', value = "Tabloid Terry")
   updateTextInput(session, 'cc_email', value = "tterry@hotmail.com")
-  updateCheckboxInput(session, 'more_background', value = 1)
   updateTextAreaInput(session, 'background_details', value = "Many swims in Dover Harbour")
   updateTextAreaInput(session, 'feed_plan', value = "Maxim with apple juice every 30 mins from kayak")
   updateTextAreaInput(session, 'feed_experience', value = "5 marathon swims in 2 years")

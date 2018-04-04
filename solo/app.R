@@ -65,15 +65,6 @@ server <- function(input, output, session) {
     if (rv$crew_count > 0) shinyjs::show("remove_crew")
     else                   shinyjs::hide("remove_crew")
 
-    if (rv$swim_count > 0) shinyjs::show("remove_swim")
-    else                   shinyjs::hide("remove_swim")
-
-    if (rv$swim_count >= 5) shinyjs::hide("add_swim")
-    else                    shinyjs::show("add_swim")
-
-    if (input$more_background == T) shinyjs::show("more_details") 
-    else                            shinyjs::hide("more_details")
-
     if (input$current_lifetime == "No") shinyjs::show("new_lifetime") 
     else                                shinyjs::hide("new_lifetime")
   })
@@ -128,48 +119,6 @@ server <- function(input, output, session) {
       rv$crew_count <<- rv$crew_count - 1
   })
   
-  # insertUI for documented swims
-  rv$swim_count <- 0
-  observeEvent(input$add_swim, {
-    rv$swim_count <<- rv$swim_count + 1
-    swimid <- paste0('swim', rv$swim_count)
-    insertUI(selector = "#doc_swims", "beforeEnd", ui = tagList(div(id = swimid,
-              textInput(paste0("swim_name", input$add_swim), 
-                label = paste("Swim", rv$swim_count, "Description"), 
-                width = "100%"),
-              fluidRow(
-                column(2, selectInput(paste0("swim_year", input$add_swim), 
-                                      "Year",
-                                       choices = seq(2017, 1997))
-                ),
-                column(2, textInput(paste0("swim_dist", input$add_swim), 
-                                    "Distance")
-                ),
-                column(2, selectInput(paste0("swim_units", input$add_swim), 
-                                      "Units",
-                                       choices = c("miles", "km"))
-                ),
-                column(2, textInput(paste0("swim_hr", input$add_swim), 
-                                    "Hr")
-                ),
-                column(2, textInput(paste0("swim_min", input$add_swim), 
-                                    "Min")
-                ),
-                column(2, textInput(paste0("swim_temp", input$add_swim), 
-                                           "Temp")
-                )
-              )
-    )))
-  })
-  
-  # removeUI for documented swims
-  observeEvent(input$remove_swim, {
-    n <- rv$swim_count
-    removeUI(selector = paste0("#swim", n))
-    if (rv$swim_count > 0) 
-      rv$swim_count <<- rv$swim_count - 1
-  })
-
   #----------- PAGE VALIDATIONS ----------------#
 
   source("validations.R", local = T)$value
