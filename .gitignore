@@ -6,3 +6,4 @@ data/
 conf/
 relay-leader/.httr-oauth
 .DS_Store
+.Rhistory

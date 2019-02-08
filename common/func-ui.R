@@ -72,7 +72,7 @@ route_boat_date <- function() {
     hidden(textInput("custom_route", "Please describe your proposed route")),
     div(id = "boat", fluidRow(
       column(6,
-        reqd(selectInput("boat_known", "Escort Boat", 
+        reqd(selectInput("boat_known", "Escort Boat/Pilot", 
           choices = boats, selectize = F))
         ),
       column(6,
