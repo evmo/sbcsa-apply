@@ -2,6 +2,7 @@
 
 #### Thanks for your interest in a Santa Barbara Channel relay swim. We looking forward to working with you.
 
+- For best results, we recommend using a standard desktop or laptop computer with a modern web browser such as Google Chrome. This application is not tested on mobile devices!
 - The following pages will guide you through the information we need about you and your planned swim. Feel free to browse through the pages to preview the questions.
 - Required fields are <span class="required">outlined in red</span>.
 - <span class="red">Red text</span> at bottom of each page provides feedback about incomplete fields.
