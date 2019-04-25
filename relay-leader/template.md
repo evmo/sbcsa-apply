@@ -6,11 +6,9 @@
 
 ### Team Leader
 
-Name | Email | Phone
----- | ----- | -----
-{{input$s_name}} | {{input$s_email}} | {{input$s_phone}}
-
-{{input$s_mailing}}
+Name | Email | Phone | Address
+---- | ----- | ----- | -------
+{{input$s_name}} | {{input$s_email}} | {{input$s_phone}} | {{input$s_mailing}}
 
 ### Team Members
 
@@ -35,8 +33,8 @@ Name | Email
 ### Escort Boat
 
 - **Boat:** {{ ifelse(input$boat_known=="BOAT NOT LISTED", input$boat_other, input$boat_known) }}
-- **Depart harbor:** {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%a %b %d %Y")}}, {{paste0(input$harbor_time, ":00 ", input$harbor_ampm)}}
-- **Swimmer in water:** {{format(input$splash_date, "%a %b %d %Y")}}, {{paste0(input$splash_time, ":00 ", input$splash_ampm)}}
+- **Depart harbor:** {{format(as.Date(input$harbor_date, origin="1970-01-01"), "%a %b %d %Y")}}, {{input$harbor_time}}
+- **Swimmer in water:** {{format(input$splash_date, "%a %b %d %Y")}}, {{input$splash_time}}
 
 ### Support Team
 

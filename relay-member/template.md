@@ -16,13 +16,10 @@ Gender | D.O.B | Age on Swim Date
 
 ### Contact Info
 
-Email | Phone
------ | -----
-{{input$s_email}} | {{input$s_phone}}
-{{input$p_email}} | {{input$p_phone}}
-
-{{input$s_mailing}}
-{{input$p_mailing}}
+Email | Phone | Address
+----- | ----- | -------
+{{input$s_email}} | {{input$s_phone}} | {{input$s_mailing}}
+{{input$p_email}} | {{input$p_phone}} | {{input$p_mailing}}
 
 ### Emergency Contact
 

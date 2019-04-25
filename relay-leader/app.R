@@ -250,8 +250,9 @@ ui <- function(request) {
                       max = Sys.Date() + years(1),
                       value = Sys.Date()))
           ),
-          column(4, selectInput("splash_time", "Hour", c(12, seq(1, 11)))),
-          column(4, selectInput("splash_ampm", "AM/PM", c("AM", "PM")))
+          column(4, selectInput("splash_time", "Time of Day", 
+            c("12:01am - 4:00am", "4:01am - 8:00am", "8:01am - noon", 
+              "afternoon", "early evening / sunset", "late night")))
         ),
         publicize(),
         uiOutput("valid_page3")

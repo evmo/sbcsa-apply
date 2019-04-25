@@ -302,8 +302,9 @@ ui <- function(request) {
         route_boat_date(),
         fluidRow(
           column(4, h5("Splash Date"), uiOutput("splash_date_disp")),
-          column(4, selectInput("splash_time", "Hour", c(12, seq(1, 11)))),
-          column(4, selectInput("splash_ampm", "AM/PM", c("AM", "PM")))
+          column(4, selectInput("splash_time", "Time of Day", 
+            c("12:01am - 4:00am", "4:01am - 8:00am", "8:01am - noon", 
+              "afternoon", "early evening / sunset", "late night")))
         ),
         publicize(),
         uiOutput("valid_page2")
@@ -363,7 +364,7 @@ ui <- function(request) {
         
         selectInput("payment_choice", 
                     label = "Which method of payment do you prefer?",
-                    choices = c("[SELECT]", "Dwolla", "PayPal", 
+                    choices = c("[SELECT]", "Credit Card", "PayPal", 
                                 "personal check", "wire transfer")
         ),
         
