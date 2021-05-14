@@ -350,10 +350,11 @@ ui <- function(request) {
         h4("Vaccination Requirement for 2021 Swims"),
         p("In the interest of the health and safety of participants in SBCSA-
            sanctioned swims in 2021, everyone aboard the escort boat -
-           <strong>swimmer, crew, pilot, and observer</strong> - will be
-           required to provide proof of COVID-19 vaccination."),
+           swimmer, crew, pilot, and observer - will be required to
+           provide proof of COVID-19 vaccination."),
         reqd(checkboxInput("vax",
-              "I understand and will comply with this requirement")),
+              "I understand and will comply with this requirement",
+              width = "100%")),
         uiOutput("valid_page5")
       ),
 
