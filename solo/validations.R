@@ -11,9 +11,9 @@ f0 <- c(
 )
 
 v1 <- reactive(list(
-  input$s_name != "", 
+  input$s_name != "",
   grepl(".+@.+\\..+", input$s_email) || grepl(".+@.+\\..+", input$p_email),
-  input$s_mailing != "" || input$p_mailing != "", 
+  input$s_mailing != "" || input$p_mailing != "",
   input$s_country != "[SELECT]",
   input$other_citizen == F | input$s_citizenship != "[SELECT]",
   input$ec_name != "",
@@ -79,12 +79,14 @@ f4 <- c(
 # HEALTH / MEDICAL
 v5 <- reactive(list(
   input$med1,
-  input$med2
+  input$med2,
+  input$vax
 ))
 
 f5 <- c(
   "You must agree with statement #1",
-  "You must agree with statement #2"
+  "You must agree with statement #2",
+  "You must indicate your understanding of the vaccination requirement"
 )
 
 # LIABILITY WAIVER

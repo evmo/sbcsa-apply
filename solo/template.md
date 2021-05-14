@@ -79,6 +79,8 @@ To the best of my knowledge, I am in excellent general health and have not omitt
 
 I have been examined by a medical doctor within the past 12 months, and have been specifically cleared to undertake this event. **Yes**
 
+In the interest of the health and safety of participants in SBCSA-sanctioned swims in 2021, everyone aboard the escort boat - swimmer, crew, pilot, and observer - will be required to provide proof of COVID-19 vaccination **I understand and will comply with this requirement**
+
 Date of Medical Exam **{{input$med_date}}**
 
 ### Signature

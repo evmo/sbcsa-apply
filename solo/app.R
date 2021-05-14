@@ -27,7 +27,7 @@ server <- function(input, output, session) {
   disable(10)
   disable(11)
   # Save & Return --> red
-  shinyjs::addClass(class = "red", 
+  shinyjs::addClass(class = "red",
     selector = ".nav li:nth-child(12) a")
 
   # fill in all inputs - for testing preview & submit
@@ -35,12 +35,12 @@ server <- function(input, output, session) {
     if (dev_mode())
       fill_sample(session)
   })
-  
+
   # observers for toggling hidden inputs
-  observe({  
+  observe({
     if (dev_mode()) shinyjs::show("fill_sample")
 
-    if (input$other_citizen == T) shinyjs::show("s_citizenship") 
+    if (input$other_citizen == T) shinyjs::show("s_citizenship")
     else                           shinyjs::hide("s_citizenship")
 
     if (input$start == "not listed here") {
@@ -65,7 +65,7 @@ server <- function(input, output, session) {
     if (rv$crew_count > 0) shinyjs::show("remove_crew")
     else                   shinyjs::hide("remove_crew")
 
-    if (input$current_lifetime == "No") shinyjs::show("new_lifetime") 
+    if (input$current_lifetime == "No") shinyjs::show("new_lifetime")
     else                                shinyjs::hide("new_lifetime")
   })
 
@@ -80,15 +80,15 @@ server <- function(input, output, session) {
   # remove start location from selectInput of finish location
   output$finish_ui <- renderUI({
     choices <- c(islands[islands != input$start], "circumnavigation")
-    selectInput("finish", "Finish Location", choices = choices, 
+    selectInput("finish", "Finish Location", choices = choices,
                 selected = "mainland", selectize = F)
   })
-  
+
   # calculate age on date of swim
   observe({
     req(is_date(input$s_dob))
     req(is_date(input$splash_date))
-    rv$swim_age <- as.period(interval(start = input$s_dob, 
+    rv$swim_age <- as.period(interval(start = input$s_dob,
                                       end = input$splash_date))$year
     # toggle under18 parent/guardian inputs
     if (rv$swim_age < 18 && rv$swim_age >= 14) {
@@ -103,7 +103,7 @@ server <- function(input, output, session) {
       shinyjs::hide("waiver_parent")
     }
   })
-  
+
   # insertUI for crew members
   rv$crew_count <- 0
   observeEvent(input$add_crew, {
@@ -111,14 +111,14 @@ server <- function(input, output, session) {
     crewid <- paste0('crew', rv$crew_count)
     insert_crew(crewid, rv$crew_count)
   })
-  
+
   # removeUI for crew members
   observeEvent(input$remove_crew, {
     removeUI(selector = paste0('#crew', rv$crew_count))
-    if (rv$crew_count > 0) 
+    if (rv$crew_count > 0)
       rv$crew_count <<- rv$crew_count - 1
   })
-  
+
   #----------- PAGE VALIDATIONS ----------------#
 
   source("validations.R", local = T)$value
@@ -142,13 +142,13 @@ server <- function(input, output, session) {
   observe(toggle_green(9, is_valid(v7())))
 
   all_valid <- reactive({
-    all(is_valid(v0()), 
-        is_valid(v1()), 
-        is_valid(v2()), 
+    all(is_valid(v0()),
+        is_valid(v1()),
+        is_valid(v2()),
         is_valid(v3()),
-        is_valid(v4()), 
-        is_valid(v5()), 
-        is_valid(v6()), 
+        is_valid(v4()),
+        is_valid(v5()),
+        is_valid(v6()),
         is_valid(v7()))
   })
 
@@ -178,7 +178,7 @@ server <- function(input, output, session) {
   observeEvent(input$gen_markdown, {
     out <- knit_expand("template.md")  # expand R expressions in template
     writeLines(out, rv$file_md)
-    markdownToHTML(text = out, 
+    markdownToHTML(text = out,
                    output = rv$file_html,
                    stylesheet = "../output.css")
     rv$v <- rv$v + 1
@@ -212,14 +212,14 @@ server <- function(input, output, session) {
       shinyjs::hide("submit_msg")
       shinyjs::show("download_next_steps")
       shinyjs::addClass(
-        class = "disabled-link", 
+        class = "disabled-link",
         selector = paste(
-                    paste(".nav li:nth-child(", c(3:10, 12), ")", sep = ""), 
+                    paste(".nav li:nth-child(", c(3:10, 12), ")", sep = ""),
                     collapse = ",")
       )
     })
   })
-  
+
   output$download <- downloadHandler(
     filename = "SBSCA_sanction_app.pdf",
     content <- function(file) file.copy(rv$file_pdf, file)
@@ -237,9 +237,9 @@ ui <- function(request) {
       HTML("<title>SBCSA Solo Swim Sanction Application</title>"),
       includeScript("../GA.js")
     ),
-    
+
     navlistPanel("Solo Swim", id = "navlist", widths = c(3, 9),
-        
+
       # -------- START HERE -------------
 
       tabPanel("Start Here",
@@ -247,7 +247,7 @@ ui <- function(request) {
         h3("Complete these questions first:"),
         fluidRow(
           column(6,
-            dateInput("s_dob", 
+            dateInput("s_dob",
                       label = "What is the swimmer's date of birth?",
                       value = "1970-01-01",
                       startview = "year",
@@ -255,7 +255,7 @@ ui <- function(request) {
                       max = Sys.Date() - years(13))
           ),
           column(6,
-            dateInput("splash_date", 
+            dateInput("splash_date",
                       label = "When is the swim scheduled to begin?",
                       value = Sys.Date(),
                       startview = "month",
@@ -267,22 +267,22 @@ ui <- function(request) {
         hidden(actionButton("fill_sample", "Fill in sample data")),
         uiOutput("valid_page0")
       ),
-      
+
       # -------- THE SWIMMER -------------
-      
+
       tabPanel("The Swimmer",
         h2("The Swimmer"),
         swimmer_info(),
         fluidRow(
-          column(6, 
-            reqd(selectInput("s_country", 
-                              "Country", 
+          column(6,
+            reqd(selectInput("s_country",
+                              "Country",
                                choices = countries,
                                selectize = F))
           ),
-          column(6, 
+          column(6,
             checkboxInput("other_citizen", width = "100%",
-                          label = "Check if you a primary citizen of a 
+                          label = "Check if you a primary citizen of a
                                    different country than your residence")
           )
         ),
@@ -294,82 +294,90 @@ ui <- function(request) {
         emerg_contact(),
         uiOutput("valid_page1")
       ),
-      
+
       # ----------- THE SWIM --------------
-      
+
       tabPanel("The Swim",
         h2("The Swim"),
         route_boat_date(),
         fluidRow(
           column(4, h5("Splash Date"), uiOutput("splash_date_disp")),
-          column(4, selectInput("splash_time", "Time of Day", 
-            c("12:01am - 4:00am", "4:01am - 8:00am", "8:01am - noon", 
+          column(4, selectInput("splash_time", "Time of Day",
+            c("12:01am - 4:00am", "4:01am - 8:00am", "8:01am - noon",
               "afternoon", "early evening / sunset", "late night")))
         ),
         publicize(),
         uiOutput("valid_page2")
       ),
-    
+
       # -------- SUPPORT TEAM ---------------
-      
+
       tabPanel("Support Team",
         h2("Support Team"),
         support_crew(),
         uiOutput("valid_page3")
       ),
-      
+
       # -------- MARATHON SWIMMING EXPERIENCE --------
-      
+
       tabPanel("Swim Experience",
         swim_experience(),
         uiOutput("valid_page4")
       ),
-      
+
       # ---------- HEALTH & MEDICAL CLEARANCE ----------
-      
+
       tabPanel("Medical Clearance",
         h2("Medical Clearance"),
         includeMarkdown("../_includes/medical.md"),
         textAreaInput("health_disclosure", "Health Disclosure",
                       width = 400, height = 125),
-        
-        p("Please read the following two statements. 
+
+        p("Please read the following two statements.
            If they are true, please check the boxes."),
-        p("1. To the best of my knowledge, I am in excellent general health 
-          and have not omitted any information which might be 
+        p("1. To the best of my knowledge, I am in excellent general health
+          and have not omitted any information which might be
           relevant to my ability to swim the Santa Barbara Channel"),
         reqd(checkboxInput("med1", "Yes, this is true")),
-        p("2. I have been examined by a medical doctor within the past 12 months, 
+        p("2. I have been examined by a medical doctor within the past 12 months,
           and have been specifically cleared to undertake this event."),
         reqd(checkboxInput("med2", "Yes, this is true")),
-        reqd(dateInput("med_date", 
+        reqd(dateInput("med_date",
                        label = "Date of Medical Exam",
                        min = Sys.Date() - years(1),
                        max = Sys.Date() + months(6))),
+        hr(),
+        h4("Vaccination Requirement for 2021 Swims"),
+        p("In the interest of the health and safety of participants in SBCSA-
+           sanctioned swims in 2021, everyone aboard the escort boat -
+           <strong>swimmer, crew, pilot, and observer</strong> - will be
+           required to provide proof of COVID-19 vaccination."),
+        reqd(checkboxInput("vax",
+              "I understand and will comply with this requirement")),
         uiOutput("valid_page5")
       ),
-      
+
       # ------ WAIVER & RELEASE OF LIABILITY ---------
-      
+
       tabPanel("Liability Waiver",
         waiver_ui(),
         uiOutput("valid_page6")
       ),
-      
+
       # --------- SANCTION FEES ---------
-      
+
       tabPanel("Sanction Fees",
         h2("Sanction Fees"),
         includeMarkdown("../_includes/sanction_fees.md"),
-        
-        selectInput("payment_choice", 
+
+        selectInput("payment_choice",
                     label = "Which method of payment do you prefer?",
-                    choices = c("[SELECT]", "Credit Card", "PayPal", 
+                    choices = c("[SELECT]", "Credit Card", "PayPal",
                                 "personal check", "wire transfer")
         ),
-        
+
         p("We will send specific instructions along with the invoice."),
-        
+
         h3("Lifetime Membership"),
         selectInput("current_lifetime",
                     label = "Are you currently a SBCSA Lifetime Member?",
@@ -378,38 +386,38 @@ ui <- function(request) {
         hidden(div(id = "new_lifetime",
           includeMarkdown("../_includes/lifetime.md"),
           radioButtons("lifetime_purchase", width = "100%",
-                       label = "Are you interesting in purchasing a 
-                                Lifetime Membership at this time?", 
+                       label = "Are you interesting in purchasing a
+                                Lifetime Membership at this time?",
                        choices = c("No", "Yes")
           )
         )),
-        
+
         h3("Cancellation Policy"),
         includeMarkdown("../_includes/cancel_policy.md"),
         p("I understand the cancellation policy"),
         checkboxInput("cancel_policy", "Yes"),
         uiOutput("valid_page7")
       ),
-      
+
       # --------- PREVIEW PAGE -----------
-      
+
       tabPanel("PREVIEW",
-        h2("Preview"), 
+        h2("Preview"),
         p("If you change any data in the previous tabs,
           you can re-generate the preview."),
         hr(),
         actionButton("gen_markdown", "Generate Preview"),
         hidden(uiOutput("preview"))
       ),
-      
+
       # --------- SUBMIT APP -----------
-      
+
       tabPanel("SUBMIT",
         h2("Submit Application"),
         actionButton("submit_app", "SUBMIT"),
         hidden(
           span(id = "submit_msg", "Submitting..."),
-          div(id = "error", 
+          div(id = "error",
               div(br(), tags$b("Error: "), span(id = "error_msg"))
         )),
         hidden(div(id = "download_next_steps",
@@ -419,10 +427,10 @@ ui <- function(request) {
           includeMarkdown("next_steps.md")
         ))
       ),
-      
+
       # --------- SAVE & RETURN -----------
-      
-      tabPanel("Save & Return Later", 
+
+      tabPanel("Save & Return Later",
         save_return_ui()
       )
     )
