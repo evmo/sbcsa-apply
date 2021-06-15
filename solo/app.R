@@ -11,7 +11,6 @@ library(gmailr)
 
 countries <- readLines("../_includes/countries.txt")
 islands <- readLines("../_includes/islands.txt")
-emails <- readLines("../conf/emails.txt")
 source("../common/func.R")
 source("../common/func-ui.R")
 source("swim_experience_ui.R")
@@ -102,12 +101,14 @@ server <- function(input, output, session) {
       shinyjs::show("under18")
       shinyjs::hide("swimmer_contact")
       shinyjs::show("parent_contact")
-      shinyjs::show("waiver_parent")
+      shinyjs::show("waiver_minor")
+      shinyjs::hide("waiver_adult")
     } else {
       shinyjs::hide("under18")
       shinyjs::show("swimmer_contact")
       shinyjs::hide("parent_contact")
-      shinyjs::hide("waiver_parent")
+      shinyjs::hide("waiver_minor")
+      shinyjs::show("waiver_adult")
     }
   })
 
@@ -136,7 +137,6 @@ server <- function(input, output, session) {
   output$valid_page3 <- renderUI(renderValid(v3(), f3))
   output$valid_page4 <- renderUI(renderValid(v4(), f4))
   output$valid_page5 <- renderUI(renderValid(v5(), f5))
-  output$valid_page6 <- renderUI(renderValid(v6(), f6))
   output$valid_page7 <- renderUI(renderValid(v7(), f7))
 
   observe(toggle_green(2, is_valid(v0())))
@@ -145,7 +145,7 @@ server <- function(input, output, session) {
   observe(toggle_green(5, is_valid(v3())))
   observe(toggle_green(6, is_valid(v4())))
   observe(toggle_green(7, is_valid(v5())))
-  observe(toggle_green(8, is_valid(v6())))
+  observe(toggle_green(8, is_valid(v5())))
   observe(toggle_green(9, is_valid(v7())))
 
   all_valid <- reactive({
@@ -155,7 +155,6 @@ server <- function(input, output, session) {
         is_valid(v3()),
         is_valid(v4()),
         is_valid(v5()),
-        is_valid(v6()),
         is_valid(v7()))
   })
 
@@ -365,11 +364,24 @@ ui <- function(request) {
         uiOutput("valid_page5")
       ),
 
-      # ------ WAIVER & RELEASE OF LIABILITY ---------
+      # ------ LIABILITY WAIVER ---------
 
       tabPanel("Liability Waiver",
-        waiver_ui(),
-        uiOutput("valid_page6")
+        h2("Liability Waiver"),
+        p("All SBCSA-sanctioned swimmers are required to sign a
+           liability waiver."),
+        hidden(div(id = "waiver_minor",
+          p("After this application is processed, a SBCSA representative
+             will reach out to the swimmer and their designated parent/guardian
+             to complete the waiver")
+        )),
+        hidden(div(id = "waiver_adult",
+          p("Before continuing this application, please read and
+             sign the waiver at HelloSign:"),
+          p(strong(a(href="https://app.hellosign.com/s/LQBu8o2D",
+                     "https://app.hellosign.com/s/LQBu8o2D"))),
+          checkboxInput("waiver_done", "I signed and submitted the waiver.")
+        ))
       ),
 
       # --------- SANCTION FEES ---------

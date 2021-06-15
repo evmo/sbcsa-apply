@@ -87,39 +87,6 @@ f5 <- c(
   "You must indicate your understanding of the vaccination requirement"
 )
 
-# LIABILITY WAIVER
-v6 <- reactive(list(
-  input[[paste0("initial", 1)]] != "",
-  input[[paste0("initial", 2)]] != "",
-  input[[paste0("initial", 3)]] != "",
-  input[[paste0("initial", 4)]] != "",
-  input[[paste0("initial", 5)]] != "",
-  input[[paste0("initial", 6)]] != "",
-  input[[paste0("initial", 7)]] != "",
-  input[[paste0("initial", 8)]] != "",
-  input[[paste0("initial", 9)]] != "",
-  input[[paste0("initial", 10)]] != "",
-  input[[paste0("initial", 11)]] != "",
-  input$waiver_box,
-  input$waiver_sig != ""
-))
-
-f6 <- c(
-  paste0("Please initial item #", 1),
-  paste0("Please initial item #", 2),
-  paste0("Please initial item #", 3),
-  paste0("Please initial item #", 4),
-  paste0("Please initial item #", 5),
-  paste0("Please initial item #", 6),
-  paste0("Please initial item #", 7),
-  paste0("Please initial item #", 8),
-  paste0("Please initial item #", 9),
-  paste0("Please initial item #", 10),
-  paste0("Please initial item #", 11),
-  "Please check the box",
-  "Signature is required"
-)
-
 # SANCTION FEES
 v7 <- reactive(list(
   input$payment_choice != "[SELECT]",
