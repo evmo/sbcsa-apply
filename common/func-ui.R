@@ -2,7 +2,7 @@ swimmer_info <- function() {
   list(
     fluidRow(
       column(6, reqd(textInput("s_name", "Full Name"))),
-      column(6, reqd(selectInput("s_gender", 
+      column(6, reqd(selectInput("s_gender",
                                  "Gender",
                                  choices = c("[SELECT]", "female", "male"),
                                  selectize = F)))
@@ -34,7 +34,7 @@ parent_contact <- function() {
 emerg_contact <- function() {
   list(
     h3("Emergency Contact Person"),
-    p("Please list an emergency contact person who will 
+    p("Please list an emergency contact person who will
         be on land during the swim."),
     fluidRow(
       reqd(column(6, textInput("ec_name", "Name"))),
@@ -51,7 +51,7 @@ under18 <- function() {
   list(
     hidden(div(id = "under18",
       h4("Swimmer will be younger than 18 on the date of the swim.
-          Is there a parent or guardian present to help complete 
+          Is there a parent or guardian present to help complete
           the rest of the application?"),
       checkboxInput("parent_present", "Yes")
     ))
@@ -64,40 +64,49 @@ route_boat_date <- function() {
   list(
     div(id = "route", fluidRow(
     column(6, reqd(selectInput("start", "Start Location",
-      choices = islands, 
+      choices = islands,
       selected = "Anacapa Island",
       selectize = F))),
     column(6, uiOutput("finish_ui"))
     )),
     hidden(textInput("custom_route", "Please describe your proposed route")),
-    div(id = "boat", fluidRow(
-      column(6,
-        reqd(selectInput("boat_known", "Escort Boat/Pilot", 
-          choices = boats, selectize = F))
+    div(id = "boat",
+      fluidRow(
+        column(6,
+          reqd(selectInput("boat_known", "Escort Boat/Pilot",
+                           choices = boats, selectize = F))
         ),
-      column(6,
-        hidden(textInput("boat_other", "Name of Boat"))
-        )
-    )),
+        column(6, hidden(textInput("boat_other", "Name of Boat")))
+      )
+    ),
     hidden(div(id = "other_pilot_harbor", fluidRow(
       column(6, textInput("pilot_other", "Name of Pilot")),
       column(6, textInput("harbor_other", "Where is the boat docked?"))
     ))),
-    hidden(div(id = "boat_notify", 
+    hidden(div(id = "boat_notify",
       p("Please notify the SBCSA as soon as you have
         made arrangements with an escort boat.")
+    )),
+    hidden(div(id = "more_boat_details",
+      p("If your escort boat is unknown to the SBCSA, we will require additional details
+         on the boat's size, type, and amenities, to determine if it is suitable for piloting
+         a channel swim. The boat must have a current USCG Vessel Safety inspection report."),
+      p("If your pilot is unknown to the SBCSA, we will require additional details on
+         their credentials, such as a USCG charter boat captain's license."),
+      p("After your application is processed, an SBCSA representative
+         will reach out to you about this.")
     )),
     hr(),
 
     h4("When is your swim scheduled?"),
     fluidRow(
-      column(4, reqd(dateInput("harbor_date", 
+      column(4, reqd(dateInput("harbor_date",
                                 "Boat Departs Harbor",
                                 min = Sys.Date(),
                                 max = Sys.Date() + years(1),
                                 value = Sys.Date()))),
-      column(4, selectInput("splash_time", "Time of Day", 
-            c("12:01am - 4:00am", "4:01am - 8:00am", "8:01am - noon", 
+      column(4, selectInput("splash_time", "Time of Day",
+            c("12:01am - 4:00am", "4:01am - 8:00am", "8:01am - noon",
               "afternoon", "early evening / sunset", "late night")))
     )
   )
@@ -106,8 +115,8 @@ route_boat_date <- function() {
 publicize <- function() {
   list(
     h4("Permission to publicize?"),
-    p("The SBCSA publishes a list of upcoming swim attempts at the 
-      beginning of each season. Do we have your permission to 
+    p("The SBCSA publishes a list of upcoming swim attempts at the
+      beginning of each season. Do we have your permission to
       publicize your attempt, or do you prefer to keep it private?"),
     radioButtons("publicize", NULL, c("Yes", "No, please keep it private"))
   )
@@ -131,18 +140,18 @@ support_crew <- function() {
 }
 
 insert_crew <- function(crewid, crew_count) {
-  insertUI(selector = "#crew", "beforeEnd", 
+  insertUI(selector = "#crew", "beforeEnd",
              ui = tagList(div(id = crewid,
-                column(4, 
-                 textInput(paste0("crew_name", crew_count), 
+                column(4,
+                 textInput(paste0("crew_name", crew_count),
                            "Name")
                 ),
-                column(4, 
-                 textInput(paste0("crew_role", crew_count), 
+                column(4,
+                 textInput(paste0("crew_role", crew_count),
                            "Role")
                 ),
-                column(4, 
-                 textInput(paste0("crew_contact", crew_count), 
+                column(4,
+                 textInput(paste0("crew_contact", crew_count),
                            "Contact Phone or Email")
                 )
     )))
@@ -152,24 +161,24 @@ waiver_ui <- function() {
   waiver <- readLines("../_includes/waiver.txt")
   list(
     h2("Liability Waiver"),
-      hidden(div(id = "waiver_parent", 
+      hidden(div(id = "waiver_parent",
         h4("The parent or guardian of the swimmer should read this form,
           initial each section, and enter an electronic signature at the bottom.")
       )),
-      h5(waiver[1]), 
+      h5(waiver[1]),
       hr(),
       p(waiver[2]),
-      
+
       lapply(3:13, function(i) { list(
         p(waiver[i]),
         reqd(textInput(paste0("initial", i-2), "Initials", width = 70))
       )}),
 
-      checkboxInput("waiver_box", 
+      checkboxInput("waiver_box",
         label = "I have read this waiver and release of liability, fully understand its terms, understand that I have given up substantial rights by signing it, and have signed it freely and voluntarily without any inducement.",
         width = "100%"
       ),
-      reqd(textInput("waiver_sig", 
+      reqd(textInput("waiver_sig",
                      "Electronic Signature",
                      placeholder = "Please type your full name"))
     )

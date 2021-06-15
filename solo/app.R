@@ -54,13 +54,20 @@ server <- function(input, output, session) {
     if (input$boat_known == "BOAT NOT LISTED") {
       shinyjs::show("boat_other")
       shinyjs::show("other_pilot_harbor")
+      shinyjs::show("more_boat_details")
     } else {
       shinyjs::hide("boat_other")
       shinyjs::hide("other_pilot_harbor")
+      shinyjs::hide("more_boat_details")
     }
 
-    if (input$boat_known == "TO BE DETERMINED") shinyjs::show("boat_notify")
-    else                                        shinyjs::hide("boat_notify")
+    if (input$boat_known == "TO BE DETERMINED") {
+      shinyjs::show("boat_notify")
+      shinyjs::show("more_boat_details")
+    } else {
+      shinyjs::hide("boat_notify")
+      shinyjs::hide("more_boat_details")
+    }
 
     if (rv$crew_count > 0) shinyjs::show("remove_crew")
     else                   shinyjs::hide("remove_crew")
