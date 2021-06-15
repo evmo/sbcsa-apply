@@ -65,7 +65,6 @@ Name | Role | Contact
 ### Other Swimmer Details
 
 - **Stroke rate:** {{input$stroke_rate}}
-- **Breathing pattern:** {{input$breathing}}
 - **Hypothermia experience:** {{input$hypothermia}}
 - **Night swimming experience:** {{input$night_swimming}}
 - **Permission to Publicize:** {{input$publicize}}

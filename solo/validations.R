@@ -61,7 +61,6 @@ v4 <- reactive(list(
   input$feed_plan != "",
   input$feed_experience != "",
   input$stroke_rate != "",
-  input$breathing != "[SELECT]",
   input$hypothermia != "",
   input$night_swimming != ""
 ))
@@ -71,7 +70,6 @@ f4 <- c(
   "Please enter a feed plan",
   "Please enter experience with feed plan",
   "Please enter stroke rate",
-  "Please select a breathing pattern",
   "Please enter hypothermia experience",
   "Please enter night swimming experience"
 )
