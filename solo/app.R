@@ -378,7 +378,8 @@ ui <- function(request) {
         hidden(div(id = "waiver_adult",
           p("Before continuing this application, please read and
              sign the waiver at HelloSign:"),
-          p(strong(a(href="https://app.hellosign.com/s/LQBu8o2D",
+          p(strong(a(target="_blank",
+                     href="https://app.hellosign.com/s/LQBu8o2D",
                      "https://app.hellosign.com/s/LQBu8o2D"))),
           checkboxInput("waiver_done", "I signed and submitted the waiver.")
         ))
